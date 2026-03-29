@@ -1,1 +1,858 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avani — After-School Tuition | Grades 6–10</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #1a1a2e;
+      --deep:     #16213e;
+      --emerald:  #0f7b5e;
+      --jade:     #1aab80;
+      --gold:     #d4a017;
+      --amber:    #f0c040;
+      --cream:    #fdf6ec;
+      --mist:     #f0ebe2;
+      --warm-mid: #8b7355;
+      --text-sub: #5c5240;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 5vw;
+      background: rgba(253, 246, 236, 0.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(212,160,23,.18);
+    }
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.55rem;
+      color: var(--emerald);
+      letter-spacing: .03em;
+    }
+    .nav-logo span { color: var(--gold); font-style: italic; }
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 500;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text-sub);
+      transition: color .25s;
+    }
+    .nav-links a:hover { color: var(--emerald); }
+    .nav-cta {
+      background: var(--emerald);
+      color: #fff !important;
+      padding: .45rem 1.2rem;
+      border-radius: 4px;
+      transition: background .25s !important;
+    }
+    .nav-cta:hover { background: var(--jade) !important; color: #fff !important; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 55% at 70% 40%, rgba(15,123,94,.09) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 20% 80%, rgba(212,160,23,.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    /* decorative ink strokes */
+    .hero-deco {
+      position: absolute;
+      right: -40px; top: 80px;
+      width: 520px; height: 520px;
+      border-radius: 50% 43% 57% 45% / 47% 52% 48% 53%;
+      border: 1.5px solid rgba(15,123,94,.15);
+      pointer-events: none;
+      animation: morphSpin 18s linear infinite;
+    }
+    .hero-deco-2 {
+      position: absolute;
+      right: 60px; top: 130px;
+      width: 380px; height: 380px;
+      border-radius: 53% 47% 44% 56% / 55% 45% 55% 45%;
+      border: 1px solid rgba(212,160,23,.12);
+      pointer-events: none;
+      animation: morphSpin 26s linear infinite reverse;
+    }
+    @keyframes morphSpin {
+      0%   { border-radius: 50% 43% 57% 45% / 47% 52% 48% 53%; transform: rotate(0deg); }
+      50%  { border-radius: 43% 57% 46% 54% / 53% 47% 53% 47%; }
+      100% { border-radius: 50% 43% 57% 45% / 47% 52% 48% 53%; transform: rotate(360deg); }
+    }
+
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 6vw 4vw 6vw 8vw;
+      position: relative; z-index: 2;
+      animation: fadeUp .9s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(15,123,94,.09);
+      border: 1px solid rgba(15,123,94,.22);
+      color: var(--emerald);
+      font-size: .75rem; font-weight: 500; letter-spacing: .09em;
+      text-transform: uppercase;
+      padding: .35rem .85rem; border-radius: 100px;
+      margin-bottom: 1.8rem;
+      width: fit-content;
+    }
+    .hero-badge::before { content: '✦'; font-size: .6rem; }
+
+    .hero-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 1.06;
+      color: var(--deep);
+      margin-bottom: .6rem;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--emerald);
+      position: relative;
+      display: inline-block;
+    }
+    .hero-title em::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: 4px; right: 0;
+      height: 3px;
+      background: var(--gold);
+      transform-origin: left;
+      animation: lineGrow 1s .8s ease both;
+    }
+    @keyframes lineGrow {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+
+    .hero-sub {
+      font-size: 1.1rem; line-height: 1.7;
+      color: var(--text-sub);
+      max-width: 440px;
+      margin: 1.4rem 0 2.4rem;
+    }
+
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--emerald);
+      color: #fff;
+      padding: .85rem 2rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500; font-size: .95rem;
+      letter-spacing: .03em;
+      transition: background .25s, transform .2s;
+      box-shadow: 0 4px 18px rgba(15,123,94,.28);
+    }
+    .btn-primary:hover { background: var(--jade); transform: translateY(-2px); }
+    .btn-outline {
+      border: 1.5px solid var(--warm-mid);
+      color: var(--warm-mid);
+      padding: .83rem 1.8rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500; font-size: .95rem;
+      transition: border-color .25s, color .25s;
+    }
+    .btn-outline:hover { border-color: var(--emerald); color: var(--emerald); }
+
+    .hero-stats {
+      display: flex; gap: 2.5rem;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(139,115,85,.2);
+    }
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 700;
+      color: var(--emerald); line-height: 1;
+    }
+    .stat-label { font-size: .78rem; color: var(--text-sub); letter-spacing: .05em; text-transform: uppercase; margin-top: .2rem; }
+
+    .hero-right {
+      display: flex; align-items: center; justify-content: center;
+      padding: 6vw 6vw 6vw 2vw;
+      position: relative; z-index: 2;
+      animation: fadeUp .9s .2s ease both;
+    }
+
+    .card-cluster {
+      position: relative; width: 380px; height: 420px;
+    }
+    .subject-card {
+      position: absolute;
+      background: #fff;
+      border-radius: 14px;
+      padding: 1.4rem 1.6rem;
+      box-shadow: 0 8px 32px rgba(26,26,46,.1);
+      transition: transform .3s;
+      border: 1px solid rgba(212,160,23,.12);
+    }
+    .subject-card:hover { transform: translateY(-6px); }
+    .subject-card .sc-icon { font-size: 2rem; margin-bottom: .6rem; }
+    .subject-card .sc-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem; color: var(--deep);
+    }
+    .subject-card .sc-tag {
+      font-size: .72rem; color: var(--emerald);
+      letter-spacing: .07em; text-transform: uppercase;
+      margin-top: .3rem;
+    }
+    /* card positions */
+    .sc1 { top: 0; left: 0; width: 175px; animation: floatA 6s ease-in-out infinite; }
+    .sc2 { top: 0; right: 0; width: 185px; animation: floatB 7s 1s ease-in-out infinite; }
+    .sc3 { top: 155px; left: 30px; width: 165px; animation: floatA 8s .5s ease-in-out infinite; }
+    .sc4 { top: 175px; right: 10px; width: 175px; animation: floatB 6.5s 1.5s ease-in-out infinite; }
+    .sc5 { bottom: 0; left: 50%; transform: translateX(-50%); width: 195px; animation: floatA 7.5s 2s ease-in-out infinite; }
+    @keyframes floatA {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+    @keyframes floatB {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+    .sc5 { animation: floatC 7.5s 2s ease-in-out infinite; }
+    @keyframes floatC {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(-8px); }
+    }
+
+    /* grade badge on card */
+    .grade-dot {
+      display: inline-block;
+      background: var(--amber);
+      color: var(--deep);
+      font-size: .65rem; font-weight: 700;
+      padding: .18rem .5rem; border-radius: 100px;
+      margin-top: .4rem;
+    }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 7rem 8vw; }
+    .section-label {
+      font-size: .75rem; font-weight: 500;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--emerald);
+      margin-bottom: .8rem;
+    }
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      color: var(--deep); line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+    .section-title em { font-style: italic; color: var(--emerald); }
+    .section-desc {
+      font-size: 1rem; color: var(--text-sub);
+      line-height: 1.75; max-width: 540px;
+    }
+
+    /* ── SUBJECTS ── */
+    #subjects { background: var(--deep); position: relative; overflow: hidden; }
+    #subjects::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 80% 50%, rgba(15,123,94,.15) 0%, transparent 65%);
+    }
+    #subjects .section-label { color: var(--amber); }
+    #subjects .section-title { color: var(--cream); }
+    #subjects .section-title em { color: var(--jade); }
+    #subjects .section-desc { color: rgba(253,246,236,.65); }
+
+    .subjects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+      margin-top: 3.5rem;
+    }
+    .subj-tile {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      padding: 2rem 1.6rem;
+      transition: background .3s, transform .3s, border-color .3s;
+      cursor: default;
+      position: relative; overflow: hidden;
+    }
+    .subj-tile::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--jade), var(--amber));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .35s ease;
+    }
+    .subj-tile:hover { background: rgba(255,255,255,.09); transform: translateY(-4px); border-color: rgba(26,171,128,.35); }
+    .subj-tile:hover::after { transform: scaleX(1); }
+    .subj-tile .t-icon { font-size: 2.2rem; margin-bottom: 1rem; }
+    .subj-tile .t-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem; color: #fff; margin-bottom: .4rem;
+    }
+    .subj-tile .t-desc { font-size: .83rem; color: rgba(253,246,236,.55); line-height: 1.6; }
+    .subj-tile .t-grades {
+      display: inline-block;
+      margin-top: .9rem;
+      background: rgba(26,171,128,.18);
+      color: var(--jade); font-size: .7rem; letter-spacing: .06em;
+      text-transform: uppercase; padding: .25rem .7rem; border-radius: 100px;
+    }
+
+    /* ── WHY AVANI ── */
+    #why { background: var(--mist); }
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      margin-top: 2rem;
+    }
+    .features-list { display: flex; flex-direction: column; gap: 1.6rem; margin-top: 2.5rem; }
+    .feat-item { display: flex; gap: 1.1rem; align-items: flex-start; }
+    .feat-icon {
+      flex-shrink: 0;
+      width: 44px; height: 44px;
+      background: rgba(15,123,94,.1);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .feat-text strong { display: block; font-size: .95rem; font-weight: 600; color: var(--deep); margin-bottom: .25rem; }
+    .feat-text span { font-size: .85rem; color: var(--text-sub); line-height: 1.6; }
+
+    .why-visual {
+      position: relative; display: flex;
+      flex-direction: column; gap: 1rem;
+    }
+    .testimonial-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 1.6rem 1.8rem;
+      box-shadow: 0 6px 24px rgba(26,26,46,.08);
+      border-left: 4px solid var(--emerald);
+      animation: fadeUp .6s ease both;
+    }
+    .testimonial-card:nth-child(2) { margin-left: 2rem; border-left-color: var(--gold); animation-delay: .15s; }
+    .testimonial-card:nth-child(3) { margin-right: 2rem; animation-delay: .3s; }
+    .tc-quote { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.05rem; color: var(--deep); line-height: 1.65; margin-bottom: .8rem; }
+    .tc-meta { display: flex; align-items: center; gap: .6rem; }
+    .tc-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--emerald);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: .8rem;
+    }
+    .tc-name { font-size: .8rem; font-weight: 600; color: var(--deep); }
+    .tc-grade { font-size: .72rem; color: var(--text-sub); }
+
+    /* ── SCHEDULE ── */
+    #schedule { background: var(--cream); }
+    .schedule-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 4rem;
+      align-items: start;
+      margin-top: 2.5rem;
+    }
+    .time-blocks { display: flex; flex-direction: column; gap: .9rem; margin-top: 1rem; }
+    .time-block {
+      display: flex; align-items: center; gap: 1rem;
+      background: #fff;
+      border: 1px solid rgba(139,115,85,.15);
+      border-radius: 10px;
+      padding: 1rem 1.4rem;
+      transition: border-color .25s, box-shadow .25s;
+    }
+    .time-block:hover { border-color: var(--emerald); box-shadow: 0 4px 16px rgba(15,123,94,.1); }
+    .tb-time {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--emerald); min-width: 90px;
+    }
+    .tb-sep { width: 1px; height: 36px; background: rgba(139,115,85,.2); }
+    .tb-info strong { display: block; font-size: .9rem; color: var(--deep); }
+    .tb-info span { font-size: .78rem; color: var(--text-sub); }
+
+    .grade-bands { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+    .grade-row {
+      display: flex; align-items: center;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(26,26,46,.06);
+    }
+    .gr-label {
+      flex-shrink: 0;
+      width: 100px;
+      background: var(--deep);
+      color: var(--cream);
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem;
+      padding: 1.1rem 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .gr-subjects {
+      display: flex; flex-wrap: wrap; gap: .4rem;
+      padding: .8rem 1rem;
+    }
+    .gs-tag {
+      background: rgba(15,123,94,.1);
+      color: var(--emerald);
+      font-size: .72rem; font-weight: 500;
+      padding: .25rem .65rem; border-radius: 100px;
+      letter-spacing: .04em;
+    }
+
+    /* ── ENROLL ── */
+    #enroll {
+      background: linear-gradient(135deg, var(--deep) 0%, #0d3b2e 100%);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    #enroll::before {
+      content: '✦';
+      position: absolute; top: 2rem; left: 6vw;
+      font-size: 5rem; color: rgba(212,160,23,.07);
+      font-family: 'Cormorant Garamond', serif;
+    }
+    #enroll::after {
+      content: '✦';
+      position: absolute; bottom: 2rem; right: 6vw;
+      font-size: 7rem; color: rgba(26,171,128,.07);
+      font-family: 'Cormorant Garamond', serif;
+    }
+    #enroll .section-label { color: var(--amber); display: block; }
+    #enroll .section-title { color: var(--cream); }
+    #enroll .section-title em { color: var(--jade); }
+    #enroll .section-desc { color: rgba(253,246,236,.6); margin: 0 auto 2.5rem; text-align: center; }
+
+    .enroll-form {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      max-width: 520px; margin: 0 auto;
+    }
+    .enroll-form input {
+      flex: 1; min-width: 200px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      padding: .9rem 1.2rem;
+      color: #fff; font-size: .95rem;
+      outline: none;
+      transition: border-color .25s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .enroll-form input::placeholder { color: rgba(253,246,236,.4); }
+    .enroll-form input:focus { border-color: var(--jade); }
+
+    .info-chips {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .chip {
+      display: flex; align-items: center; gap: .45rem;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(253,246,236,.7);
+      font-size: .8rem; padding: .5rem 1rem; border-radius: 100px;
+    }
+    .chip .ci { font-size: 1rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      padding: 2.5rem 8vw;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem; color: var(--jade);
+    }
+    .footer-logo span { color: var(--amber); font-style: italic; }
+    footer p { font-size: .78rem; color: rgba(253,246,236,.4); }
+    .footer-links { display: flex; gap: 1.4rem; }
+    .footer-links a { font-size: .78rem; color: rgba(253,246,236,.45); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--jade); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; padding-top: 70px; }
+      .hero-right { display: none; }
+      .hero-left { padding: 4rem 6vw; }
+      .why-grid, .schedule-wrap { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">Avani<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#subjects">Subjects</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#enroll" class="nav-cta">Enrol Now</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" id="home">
+  <div class="hero-deco"></div>
+  <div class="hero-deco-2"></div>
+
+  <div class="hero-left">
+    <div class="hero-badge">After-School Tuition · Grades 6 – 10</div>
+    <h1 class="hero-title">
+      Learn with<br>
+      <em>Avani</em><br>
+      Grow with Confidence
+    </h1>
+    <p class="hero-sub">
+      Personalised, structured tuition for every student from Grade 6 to 10 —
+      building strong fundamentals in Maths, Science, English, and Social Studies.
+    </p>
+    <div class="hero-btns">
+      <a href="#enroll" class="btn-primary">Start Learning →</a>
+      <a href="#schedule" class="btn-outline">View Schedule</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">5</div>
+        <div class="stat-label">Grade Levels</div>
+      </div>
+      <div>
+        <div class="stat-num">6+</div>
+        <div class="stat-label">Subjects Covered</div>
+      </div>
+      <div>
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Dedicated Care</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="card-cluster">
+      <div class="subject-card sc1">
+        <div class="sc-icon">➗</div>
+        <div class="sc-name">Mathematics</div>
+        <div class="sc-tag">Numbers & Algebra</div>
+        <span class="grade-dot">Gr 6–10</span>
+      </div>
+      <div class="subject-card sc2">
+        <div class="sc-icon">🔬</div>
+        <div class="sc-name">Science</div>
+        <div class="sc-tag">Physics · Chemistry · Bio</div>
+        <span class="grade-dot">Gr 8–10</span>
+      </div>
+      <div class="subject-card sc3">
+        <div class="sc-icon">📖</div>
+        <div class="sc-name">English</div>
+        <div class="sc-tag">Grammar & Writing</div>
+        <span class="grade-dot">Gr 6–10</span>
+      </div>
+      <div class="subject-card sc4">
+        <div class="sc-icon">🌍</div>
+        <div class="sc-name">Social Studies</div>
+        <div class="sc-tag">History · Geography</div>
+        <span class="grade-dot">Gr 6–10</span>
+      </div>
+      <div class="subject-card sc5">
+        <div class="sc-icon">💻</div>
+        <div class="sc-name">Computers</div>
+        <div class="sc-tag">Basics & Programming</div>
+        <span class="grade-dot">Gr 6–9</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SUBJECTS ── -->
+<section id="subjects">
+  <div class="reveal">
+    <div class="section-label">What We Teach</div>
+    <h2 class="section-title">Subjects Taught at <em>Avani</em></h2>
+    <p class="section-desc">Each subject is taught with a focus on understanding, not rote learning — equipping students for board exams and beyond.</p>
+  </div>
+  <div class="subjects-grid">
+    <div class="subj-tile reveal">
+      <div class="t-icon">➗</div>
+      <div class="t-name">Mathematics</div>
+      <div class="t-desc">Algebra, geometry, mensuration, statistics, and trigonometry — built step by step.</div>
+      <span class="t-grades">Grades 6 – 10</span>
+    </div>
+    <div class="subj-tile reveal">
+      <div class="t-icon">⚗️</div>
+      <div class="t-name">Science</div>
+      <div class="t-desc">Physics, Chemistry, and Biology integrated with experiments and real-world connections.</div>
+      <span class="t-grades">Grades 6 – 10</span>
+    </div>
+    <div class="subj-tile reveal">
+      <div class="t-icon">📝</div>
+      <div class="t-name">English</div>
+      <div class="t-desc">Reading comprehension, grammar, essay writing, and spoken confidence for every student.</div>
+      <span class="t-grades">Grades 6 – 10</span>
+    </div>
+    <div class="subj-tile reveal">
+      <div class="t-icon">🗺️</div>
+      <div class="t-name">Social Studies</div>
+      <div class="t-desc">History, civics, geography, and economics made engaging through maps and stories.</div>
+      <span class="t-grades">Grades 6 – 10</span>
+    </div>
+    <div class="subj-tile reveal">
+      <div class="t-icon">💻</div>
+      <div class="t-name">Computer Science</div>
+      <div class="t-desc">Foundational computing, MS Office, and introduction to programming basics.</div>
+      <span class="t-grades">Grades 6 – 9</span>
+    </div>
+    <div class="subj-tile reveal">
+      <div class="t-icon">🗣️</div>
+      <div class="t-name">Telugu / Hindi</div>
+      <div class="t-desc">Language proficiency, grammar, and literature support for regional language papers.</div>
+      <span class="t-grades">Grades 6 – 10</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHY AVANI ── -->
+<section id="why">
+  <div class="why-grid">
+    <div>
+      <div class="section-label reveal">Why Choose Avani</div>
+      <h2 class="section-title reveal">More than tuition —<br><em>a learning home</em></h2>
+      <p class="section-desc reveal">We believe every student learns differently. Avani adapts to each child's pace, strengths, and areas for growth.</p>
+      <div class="features-list">
+        <div class="feat-item reveal">
+          <div class="feat-icon">🎯</div>
+          <div class="feat-text">
+            <strong>Personalised Attention</strong>
+            <span>Small batches ensure every student gets focused time with the teacher, not just classroom instruction.</span>
+          </div>
+        </div>
+        <div class="feat-item reveal">
+          <div class="feat-icon">📊</div>
+          <div class="feat-text">
+            <strong>Weekly Progress Tracking</strong>
+            <span>Parents receive regular updates on their child's performance, attendance, and areas to improve.</span>
+          </div>
+        </div>
+        <div class="feat-item reveal">
+          <div class="feat-icon">📚</div>
+          <div class="feat-text">
+            <strong>CBSE / State Board Aligned</strong>
+            <span>All content is structured to match the school syllabus for Grades 6 through 10, including board exam prep.</span>
+          </div>
+        </div>
+        <div class="feat-item reveal">
+          <div class="feat-icon">🌟</div>
+          <div class="feat-text">
+            <strong>Doubt-Clearing Sessions</strong>
+            <span>Dedicated sessions every week where students can ask anything without hesitation.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="why-visual">
+      <div class="testimonial-card reveal">
+        <p class="tc-quote">"My daughter's Maths marks went from 62 to 91 within two terms. The teachers here genuinely care."</p>
+        <div class="tc-meta">
+          <div class="tc-avatar">R</div>
+          <div>
+            <div class="tc-name">Ramadevi K.</div>
+            <div class="tc-grade">Parent of Grade 8 student</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <p class="tc-quote">"I was always scared of Science. Avani made it feel simple and even fun for me."</p>
+        <div class="tc-meta">
+          <div class="tc-avatar" style="background:var(--gold);color:var(--deep);">A</div>
+          <div>
+            <div class="tc-name">Arjun M.</div>
+            <div class="tc-grade">Grade 9 Student</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <p class="tc-quote">"The doubt sessions are incredible — my son never feels embarrassed to ask questions here."</p>
+        <div class="tc-meta">
+          <div class="tc-avatar" style="background:#6c5ce7;">P</div>
+          <div>
+            <div class="tc-name">Priya S.</div>
+            <div class="tc-grade">Parent of Grade 10 student</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SCHEDULE ── -->
+<section id="schedule">
+  <div class="section-label reveal">Class Timings</div>
+  <h2 class="section-title reveal">Flexible <em>Schedules</em> for Every Student</h2>
+  <div class="schedule-wrap">
+    <div>
+      <p class="section-desc reveal">Choose a batch that fits your school hours and activities. Weekend revision classes also available.</p>
+      <div class="time-blocks">
+        <div class="time-block reveal">
+          <div class="tb-time">4:00 PM</div>
+          <div class="tb-sep"></div>
+          <div class="tb-info"><strong>Evening Batch 1</strong><span>Mon – Fri · Grades 6 & 7</span></div>
+        </div>
+        <div class="time-block reveal">
+          <div class="tb-time">5:30 PM</div>
+          <div class="tb-sep"></div>
+          <div class="tb-info"><strong>Evening Batch 2</strong><span>Mon – Fri · Grades 8 & 9</span></div>
+        </div>
+        <div class="time-block reveal">
+          <div class="tb-time">7:00 PM</div>
+          <div class="tb-sep"></div>
+          <div class="tb-info"><strong>Evening Batch 3</strong><span>Mon – Fri · Grade 10 (Board Prep)</span></div>
+        </div>
+        <div class="time-block reveal">
+          <div class="tb-time">9:00 AM</div>
+          <div class="tb-sep"></div>
+          <div class="tb-info"><strong>Weekend Revision</strong><span>Sat & Sun · All Grades</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="section-desc reveal" style="margin-bottom:1.2rem;">Subject coverage by grade:</p>
+      <div class="grade-bands">
+        <div class="grade-row reveal">
+          <div class="gr-label">Gr 6</div>
+          <div class="gr-subjects">
+            <span class="gs-tag">Maths</span><span class="gs-tag">Science</span><span class="gs-tag">English</span><span class="gs-tag">Social</span><span class="gs-tag">Telugu</span>
+          </div>
+        </div>
+        <div class="grade-row reveal">
+          <div class="gr-label">Gr 7</div>
+          <div class="gr-subjects">
+            <span class="gs-tag">Maths</span><span class="gs-tag">Science</span><span class="gs-tag">English</span><span class="gs-tag">Social</span><span class="gs-tag">Computers</span>
+          </div>
+        </div>
+        <div class="grade-row reveal">
+          <div class="gr-label">Gr 8</div>
+          <div class="gr-subjects">
+            <span class="gs-tag">Maths</span><span class="gs-tag">Physics</span><span class="gs-tag">Chemistry</span><span class="gs-tag">Bio</span><span class="gs-tag">English</span>
+          </div>
+        </div>
+        <div class="grade-row reveal">
+          <div class="gr-label">Gr 9</div>
+          <div class="gr-subjects">
+            <span class="gs-tag">Maths</span><span class="gs-tag">Physics</span><span class="gs-tag">Chemistry</span><span class="gs-tag">Bio</span><span class="gs-tag">Social</span>
+          </div>
+        </div>
+        <div class="grade-row reveal">
+          <div class="gr-label">Gr 10</div>
+          <div class="gr-subjects">
+            <span class="gs-tag">Maths</span><span class="gs-tag">Physics</span><span class="gs-tag">Chemistry</span><span class="gs-tag">Bio</span><span class="gs-tag">Social</span><span class="gs-tag">English</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ENROLL ── -->
+<section id="enroll">
+  <span class="section-label reveal">Get In Touch</span>
+  <h2 class="section-title reveal">Begin your child's<br><em>learning journey</em> today</h2>
+  <p class="section-desc reveal">Leave your name and number — we'll reach out to discuss the right batch and subjects for your child.</p>
+  <form class="enroll-form reveal" onsubmit="handleSubmit(event)">
+    <input type="text" placeholder="Student / Parent Name" required />
+    <input type="tel" placeholder="Phone Number" required />
+    <button type="submit" class="btn-primary">Enquire →</button>
+  </form>
+  <div class="info-chips reveal">
+    <div class="chip"><span class="ci">📍</span> Hyderabad, Telangana</div>
+    <div class="chip"><span class="ci">📞</span> Call / WhatsApp Us</div>
+    <div class="chip"><span class="ci">🕓</span> Mon – Sun, 9 AM – 9 PM</div>
+    <div class="chip"><span class="ci">🎓</span> Grades 6 – 10</div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">Avani<span>.</span></div>
+  <p>© 2025 Avani After-School Tuition · Hyderabad</p>
+  <div class="footer-links">
+    <a href="#home">Home</a>
+    <a href="#subjects">Subjects</a>
+    <a href="#schedule">Schedule</a>
+    <a href="#enroll">Enrol</a>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => io.observe(el));
+
+  // Form
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.textContent = '✓ We\'ll be in touch!';
+    btn.style.background = 'var(--jade)';
+    btn.disabled = true;
+  }
+</script>
+
+</body>
+</html>
