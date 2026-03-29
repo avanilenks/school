@@ -1,0 +1,436 @@
+import { useState, useMemo } from "react";
+
+const HOLIDAYS = new Set([
+  "2025-04-18","2025-05-01","2025-08-15","2025-10-02",
+  "2025-10-20","2025-10-21","2025-11-05"
+]);
+const HOLIDAY_NAMES = {
+  "2025-04-18":"Good Friday","2025-05-01":"Labour Day",
+  "2025-08-15":"Independence Day","2025-10-02":"Gandhi Jayanti",
+  "2025-10-20":"Diwali","2025-10-21":"Diwali (2nd day)","2025-11-05":"Guru Nanak Jayanti"
+};
+
+const SC = {
+  Math:     {emoji:"📐",label:"Mathematics", bg:"#EFF6FF",badge:"#2563EB",border:"#BFDBFE",txt:"#1D4ED8"},
+  Physics:  {emoji:"⚡",label:"Physics",     bg:"#FFFBEB",badge:"#D97706",border:"#FDE68A",txt:"#92400E"},
+  Chemistry:{emoji:"🧪",label:"Chemistry",   bg:"#F0FDF4",badge:"#16A34A",border:"#BBF7D0",txt:"#14532D"},
+  Biology:  {emoji:"🌿",label:"Biology",     bg:"#FAF5FF",badge:"#7C3AED",border:"#DDD6FE",txt:"#4C1D95"},
+  Revision: {emoji:"🔁",label:"Revision",    bg:"#F8FAFC",badge:"#475569",border:"#CBD5E1",txt:"#334155"},
+  Buffer:   {emoji:"🛡️",label:"Buffer Day",  bg:"#F1F5F9",badge:"#94A3B8",border:"#E2E8F0",txt:"#475569"},
+  Mock:     {emoji:"📝",label:"Mock Test",   bg:"#FFF1F2",badge:"#E11D48",border:"#FECDD3",txt:"#9F1239"},
+  Holiday:  {emoji:"🎉",label:"Holiday",     bg:"#FFF7ED",badge:"#EA580C",border:"#FED7AA",txt:"#7C2D12"},
+};
+
+const MATH_S = [
+  {ch:"Real Numbers",concept:"Fundamental Theorem of Arithmetic – prime factorization; HCF & LCM via factorization",practice:"NCERT Ex 1.1 – 10 HCF/LCM problems using prime factorization"},
+  {ch:"Real Numbers",concept:"Proving irrationality of √2, √3, √5 using contradiction method",practice:"NCERT Ex 1.2 – 5 irrationality proofs + 5 decimal expansion MCQs"},
+  {ch:"Real Numbers",concept:"Terminating vs non-terminating decimals; chapter recap",practice:"Chapter mini-test: 15 mixed questions (MCQ + short answer)"},
+  {ch:"Polynomials",concept:"Zeroes of a polynomial – graphical meaning; parabola and x-intercepts",practice:"NCERT Ex 2.1 – find zeroes from graph; verify geometrically"},
+  {ch:"Polynomials",concept:"Relationship between zeroes & coefficients; division algorithm",practice:"NCERT Ex 2.2, 2.3 – form polynomial from zeroes; verify sum/product rules"},
+  {ch:"Polynomials",concept:"Chapter revision + mini-test",practice:"Chapter test: 10 problems (2-mark & 3-mark mix)"},
+  {ch:"Pair of Linear Equations",concept:"Graphical method – consistent/inconsistent/dependent systems; conditions for each type",practice:"NCERT Ex 3.1 – plot 3 equation pairs; identify nature of solution"},
+  {ch:"Pair of Linear Equations",concept:"Substitution method – step-by-step algebraic approach",practice:"NCERT Ex 3.3 – 8 problems using substitution"},
+  {ch:"Pair of Linear Equations",concept:"Elimination method – systematic approach with verification",practice:"NCERT Ex 3.4 – 8 problems using elimination"},
+  {ch:"Pair of Linear Equations",concept:"Word problems: age, number, coins, speed, ratio & proportion",practice:"NCERT Ex 3.5, 3.6 – 10 real-life word problems"},
+  {ch:"Pair of Linear Equations",concept:"Chapter revision – choosing best method; cross-multiplication overview",practice:"Chapter test: 20-mark paper from past years"},
+  {ch:"Quadratic Equations",concept:"Standard form ax²+bx+c=0; solving by factorization (splitting middle term)",practice:"NCERT Ex 4.2 – 10 equations by factorization"},
+  {ch:"Quadratic Equations",concept:"Quadratic formula; discriminant D=b²–4ac; nature of roots",practice:"NCERT Ex 4.3 – 10 equations; determine nature of roots from D"},
+  {ch:"Quadratic Equations",concept:"Real-life situational problems using quadratic equations",practice:"NCERT Ex 4.4 + 5 past paper word problems"},
+  {ch:"Quadratic Equations",concept:"Chapter revision + chapter test",practice:"Chapter test: 20-mark timed paper"},
+  {ch:"Arithmetic Progressions",concept:"AP definition; common difference d; nth term aₙ=a+(n–1)d – derivation",practice:"NCERT Ex 5.1, 5.2 – 10 nth term problems"},
+  {ch:"Arithmetic Progressions",concept:"Sum formula Sₙ=n/2[2a+(n–1)d] – derivation + application problems",practice:"NCERT Ex 5.3 – 10 sum of AP problems"},
+  {ch:"Arithmetic Progressions",concept:"Real-life AP problems: salary, stacking, savings, distance",practice:"NCERT Ex 5.4 + 5 exemplar application problems"},
+  {ch:"Arithmetic Progressions",concept:"Chapter revision + chapter test",practice:"Chapter test: 15-mark paper"},
+  {ch:"Triangles",concept:"Similar triangles – AA, SAS, SSS similarity criteria with examples",practice:"NCERT Ex 6.1, 6.2 – identify similarity; write short proofs"},
+  {ch:"Triangles",concept:"Basic Proportionality Theorem (Thales) – proof + converse",practice:"NCERT Ex 6.2 – 10 BPT application problems"},
+  {ch:"Triangles",concept:"Areas of similar triangles: ratio of areas = (ratio of sides)²",practice:"NCERT Ex 6.4 – 8 problems on areas of similar triangles"},
+  {ch:"Triangles",concept:"Pythagoras theorem + converse – proof and problem applications",practice:"NCERT Ex 6.5 – 10 Pythagoras problems"},
+  {ch:"Triangles",concept:"Chapter revision – all 5 criteria; common exam patterns",practice:"Chapter test: 25-mark paper (theorems + numericals)"},
+  {ch:"Coordinate Geometry",concept:"Distance formula derivation; shape detection; collinearity test",practice:"NCERT Ex 7.1 – 10 distance problems (shape detection)"},
+  {ch:"Coordinate Geometry",concept:"Section formula (internal division); midpoint formula",practice:"NCERT Ex 7.2 – 10 section formula problems"},
+  {ch:"Coordinate Geometry",concept:"Mixed problems + chapter test",practice:"Chapter test: 15-mark paper"},
+  {ch:"Circles",concept:"Tangent to circle – perpendicularity to radius at point of contact (proof)",practice:"NCERT Ex 10.1 – 5 proof-based problems"},
+  {ch:"Circles",concept:"Lengths of tangents from external point are equal – proof + applications",practice:"NCERT Ex 10.2 – 10 problems on tangent length and angles"},
+  {ch:"Circles",concept:"Chapter revision + chapter test",practice:"Chapter test: 15 marks"},
+  {ch:"Areas Related to Circles",concept:"Area of sector & segment; central angles 60°/90°/120°",practice:"NCERT Ex 12.1, 12.2 – 8 sector & segment problems"},
+  {ch:"Areas Related to Circles",concept:"Combined figure problems (circle + triangle/rectangle/square)",practice:"NCERT Ex 12.3 – 8 combined area problems"},
+  {ch:"Areas Related to Circles",concept:"Revision + chapter test",practice:"Chapter test: 15 marks"},
+  {ch:"Surface Area & Volume",concept:"SA & Volume recap: cone, sphere, hemisphere – all formulas",practice:"NCERT Ex 13.1 – 10 individual solid problems"},
+  {ch:"Surface Area & Volume",concept:"Surface area of combinations: cylinder+cone, sphere+cylinder, etc.",practice:"NCERT Ex 13.1 harder problems – 8 combination SA questions"},
+  {ch:"Surface Area & Volume",concept:"Volume of combinations + conversion of solids (melting/recasting)",practice:"NCERT Ex 13.2, 13.3 – 8 volume + conversion problems"},
+  {ch:"Surface Area & Volume",concept:"Chapter revision + chapter test",practice:"Chapter test: 20-mark paper"},
+  {ch:"Statistics",concept:"Mean of grouped data: direct method + assumed mean method",practice:"NCERT Ex 14.1 – 3 problems per method"},
+  {ch:"Statistics",concept:"Step deviation method for mean + Mode of grouped data",practice:"NCERT Ex 14.1, 14.2 – 5 problems each"},
+  {ch:"Statistics",concept:"Median of grouped data + cumulative frequency curve (ogive)",practice:"NCERT Ex 14.3, 14.4 – 5 problems + draw ogive"},
+  {ch:"Statistics",concept:"Chapter revision + chapter test",practice:"Chapter test: 15-mark paper"},
+  {ch:"Probability",concept:"Classical probability P(E)=n(E)/n(S); complementary, impossible & certain events",practice:"NCERT Ex 15.1 – 10 problems (cards, dice, balls, coins)"},
+  {ch:"Probability",concept:"Advanced probability problems + full chapter revision",practice:"Chapter test + 2 past year probability questions"},
+  {ch:"📊 Algebra Revision",concept:"Polynomials, Linear Eq., Quadratic, AP – key formulas one-page summary",practice:"30 MCQs + 5 long-answer questions from past papers (Algebra)"},
+  {ch:"📐 Geometry Revision",concept:"Triangles, Circles, Coordinate Geometry – all theorems + formula sheet",practice:"25 mixed problems including 2 proof questions"},
+  {ch:"📏 Mensuration Revision",concept:"Areas, SA & Volumes – all formulas one-shot revision",practice:"20 mixed numericals + 2 past paper mensuration questions"},
+  {ch:"📈 Stats & Prob. Revision",concept:"All 3 measures of central tendency + probability formula summary",practice:"Full chapter mock: 20 marks"},
+  {ch:"📝 Math Mock Test 1",concept:"Full syllabus mock: 80 marks, 3 hours – simulate board conditions",practice:"Attempt under strict conditions; analyse errors; list weak areas"},
+  {ch:"📝 Math Mock Test 2",concept:"Second full mock + targeted weak-area revision",practice:"Identify top 3 weak chapters → revise → attempt 1 past paper"},
+];
+
+const PHYSICS_S = [
+  {ch:"Light – Reflection",concept:"Laws of reflection; spherical mirrors: pole, focus, C, R; concave vs convex",practice:"Draw all 6 ray diagrams for concave mirror; label all key points"},
+  {ch:"Light – Reflection",concept:"Image formation: concave mirror – all 6 object positions with characteristics",practice:"Complete image-formation table; 3 labelled ray diagrams"},
+  {ch:"Light – Reflection",concept:"Image formation: convex mirror; uses of mirrors (torch, headlights, rear-view)",practice:"2 convex mirror ray diagrams; 5 MCQs on mirror applications"},
+  {ch:"Light – Reflection",concept:"Mirror formula 1/v+1/u=1/f; magnification m=–v/u; New Cartesian sign convention",practice:"10 mirror formula numericals (find v, u, f, or m)"},
+  {ch:"Light – Reflection",concept:"Chapter revision: sign convention traps; comparison concave vs convex",practice:"Chapter mini-test: 15 marks (mirrors only)"},
+  {ch:"Light – Refraction",concept:"Laws of refraction; Snell's law n₁sinθ₁=n₂sinθ₂; refractive index n=c/v",practice:"5 Snell's law numericals + 5 refractive index calculations"},
+  {ch:"Light – Refraction",concept:"Refraction through glass slab (lateral shift); apparent depth formula",practice:"5 glass slab problems; draw refraction diagrams with normals"},
+  {ch:"Light – Refraction",concept:"Lenses: convex & concave; image formation for all object positions (convex lens)",practice:"Complete image-formation table for convex lens; 3 ray diagrams"},
+  {ch:"Light – Refraction",concept:"Lens formula 1/v–1/u=1/f; magnification m=v/u; Power P=1/f(D); combined lenses",practice:"10 lens numericals + 5 combined lens power problems"},
+  {ch:"Light – Refraction",concept:"Full Light chapter revision + chapter test",practice:"Chapter test: 25 marks – mirrors, lenses, numericals, uses"},
+  {ch:"Human Eye",concept:"Eye structure: cornea, iris, pupil, lens, retina; power of accommodation",practice:"Label eye diagram; 5 short-answer questions; NCERT Q1–4"},
+  {ch:"Human Eye",concept:"Defects: myopia (concave), hypermetropia (convex), presbyopia – causes & correction",practice:"Ray diagrams for all 3 defects before + after correction; 8 Q"},
+  {ch:"Human Eye",concept:"Dispersion through glass prism; visible spectrum VIBGYOR; recombination; rainbow",practice:"Prism diagram; spectrum order; 5 questions"},
+  {ch:"Human Eye",concept:"Tyndall effect; blue sky; red sunset; atmospheric refraction; chapter test",practice:"Chapter test: 15 marks (full human eye chapter)"},
+  {ch:"Electricity",concept:"Electric charge; current I=Q/t; potential difference V=W/Q; SI units",practice:"10 definition MCQs; 5 basic calculation problems; NCERT Q1–3"},
+  {ch:"Electricity",concept:"Ohm's Law V=IR; resistance; V-I graphs for ohmic vs non-ohmic conductors",practice:"10 Ohm's law numericals; draw & interpret V-I graphs"},
+  {ch:"Electricity",concept:"Resistance factors (l, A, ρ, T); resistivity values; alloys vs pure metals",practice:"8 resistivity comparison & calculation problems"},
+  {ch:"Electricity",concept:"Series combination: Rₛ=R₁+R₂+…; same current; voltage divides proportionally",practice:"8 series circuit numericals with circuit diagrams"},
+  {ch:"Electricity",concept:"Parallel combination: 1/Rₚ=1/R₁+1/R₂; same voltage; current divides",practice:"8 parallel circuit numericals + 3 mixed series-parallel problems"},
+  {ch:"Electricity",concept:"Joule's Law H=I²Rt; power P=VI=I²R=V²/R; energy in kWh; electricity bill",practice:"10 power/energy numericals; electricity bill calculation"},
+  {ch:"Electricity",concept:"Domestic wiring: live/neutral/earth; fuse; MCB; earthing – safety reasons",practice:"Chapter test: 25 marks (full electricity chapter)"},
+  {ch:"Magnetic Effects",concept:"Magnetic field lines – properties; field due to straight current-carrying conductor",practice:"Draw field diagrams; right-hand thumb rule direction problems"},
+  {ch:"Magnetic Effects",concept:"Field due to circular coil & solenoid; electromagnet; factors affecting strength",practice:"Draw solenoid field; 5 problems; label electromagnet diagram"},
+  {ch:"Magnetic Effects",concept:"Force on current in B-field; F=BIL; Fleming's Left-Hand Rule; electric motor",practice:"8 force-direction problems; label & explain DC motor diagram"},
+  {ch:"Magnetic Effects",concept:"Electromagnetic induction; Faraday's law; Fleming's Right-Hand Rule; AC generator",practice:"8 questions; draw AC generator; AC vs DC comparison table"},
+  {ch:"Magnetic Effects",concept:"Chapter revision + chapter test",practice:"Chapter test: 20 marks (full magnetic effects chapter)"},
+  {ch:"🔁 Physics Rev. – Light",concept:"Mirror & lens formulas; all ray diagram rules; power of lens; applications",practice:"20 mixed numericals + 5 diagram-based past paper questions"},
+  {ch:"🔁 Physics Rev. – Electricity",concept:"Ohm's law; series/parallel circuits; Joule's law; magnetic rules; induction",practice:"20 mixed problems + 5 past paper questions"},
+  {ch:"📝 Physics Mock Test",concept:"Complete Physics mock: 35 marks, 60 min timed simulation",practice:"Attempt full paper under exam conditions; analyse all errors"},
+];
+
+const CHEMISTRY_S = [
+  {ch:"Chemical Reactions",concept:"Signs of chemical change; writing skeleton equations; balancing by conservation",practice:"NCERT Ex 1.1 – balance 10 equations; identify reactants/products"},
+  {ch:"Chemical Reactions",concept:"Types: combination, decomposition (thermal/electrolytic/photolytic), displacement",practice:"NCERT Ex 1.2 – write & classify 10 reactions with observations"},
+  {ch:"Chemical Reactions",concept:"Double displacement, precipitation, neutralisation reactions + observations",practice:"NCERT Ex 1.3 – 8 reaction-type identification problems"},
+  {ch:"Chemical Reactions",concept:"Oxidation, reduction, redox; identify OA & RA; corrosion; rancidity prevention",practice:"Identify OA/RA in 10 reactions; 5 past paper questions on corrosion"},
+  {ch:"Chemical Reactions",concept:"Chapter revision + chapter test",practice:"Chapter test: 20 marks – equations, types, OA/RA identification"},
+  {ch:"Acids, Bases & Salts",concept:"Properties of acids; reactions with metals, metal oxides, metal carbonates",practice:"NCERT Ex 2.1 – 10 reaction equations with observations"},
+  {ch:"Acids, Bases & Salts",concept:"Indicators; pH scale 0–14; strong vs weak acids/bases",practice:"10 pH MCQs; 5 indicator colour change questions"},
+  {ch:"Acids, Bases & Salts",concept:"Dilution safety (acid into water); H⁺/OH⁻ concept; acid/base with water",practice:"10 concept questions; 5 dilution problems"},
+  {ch:"Acids, Bases & Salts",concept:"Salts – neutralisation; pH of salts; families: NaCl, Na₂SO₄, Na₂CO₃",practice:"NCERT Ex 2.3 – 8 salt preparation, pH & family problems"},
+  {ch:"Acids, Bases & Salts",concept:"Key chemicals: NaOH, washing soda, baking soda, bleaching powder, Plaster of Paris",practice:"Short answer + MCQ practice on all 5 important chemicals"},
+  {ch:"Acids, Bases & Salts",concept:"Chapter revision + chapter test",practice:"Chapter test: 25 marks – reactions, pH, salts, chemicals"},
+  {ch:"Metals & Non-Metals",concept:"Physical properties: lustre, hardness, ductility, malleability, conductivity",practice:"Comparison table (10 metals vs 5 non-metals); 10 MCQs"},
+  {ch:"Metals & Non-Metals",concept:"Chemical properties: reactions with O₂, water, dilute acids; displacement",practice:"NCERT Ex 3.1 – write & balance 10 reactions; predict products"},
+  {ch:"Metals & Non-Metals",concept:"Reactivity series K→Na→Ca→Mg→Al→Zn→Fe→Pb→H→Cu→Ag→Au + applications",practice:"Predict 8 displacement reactions; 5 past paper problems"},
+  {ch:"Metals & Non-Metals",concept:"Ionic bond formation: electron transfer, ion formation; properties of ionic compounds",practice:"Draw electron-dot structures; write 5 ionic compound formations"},
+  {ch:"Metals & Non-Metals",concept:"Metallurgy: enrichment, reduction, electrolytic refining; alloys; anti-corrosion",practice:"8 metallurgy short-answer + 5 past paper questions"},
+  {ch:"Metals & Non-Metals",concept:"Chapter revision + chapter test",practice:"Chapter test: 25 marks – properties, reactions, reactivity, metallurgy"},
+  {ch:"Carbon & Compounds",concept:"Tetravalency; catenation; allotropes of carbon (diamond, graphite, fullerene)",practice:"Draw C structures; allotrope diagrams; 8 MCQs on bonding"},
+  {ch:"Carbon & Compounds",concept:"Chains, branches, rings; homologous series; functional groups (–OH, –CHO, –COOH, –Cl)",practice:"Identify functional groups; draw 10 organic compound structures"},
+  {ch:"Carbon & Compounds",concept:"IUPAC nomenclature: rules for alkanes, alkenes, alkynes, substituted compounds",practice:"Name 15 given structures; draw 10 structures from IUPAC names"},
+  {ch:"Carbon & Compounds",concept:"Chemical properties: combustion (complete/incomplete); oxidation; addition reaction",practice:"Write 10 combustion & addition reactions; NCERT Ex 4"},
+  {ch:"Carbon & Compounds",concept:"Substitution (alkanes + Cl₂/light); ethanol properties, oxidation to acetic acid",practice:"8 substitution problems; ethanol reaction equations; 5 MCQs"},
+  {ch:"Carbon & Compounds",concept:"Ethanoic acid properties & reactions; soaps & detergents: micelle, cleansing action",practice:"6 ethanoic acid equations; draw micelle diagram; 8 past paper Q"},
+  {ch:"Carbon & Compounds",concept:"Chapter revision + chapter test",practice:"Chapter test: 25 marks – nomenclature, reactions, soaps"},
+  {ch:"🔁 Chem Rev. – Reactions",concept:"Balancing equations; all reaction types; acid-base reactions; pH; key chemicals",practice:"30 MCQs + 5 short answers (2 marks each) from past papers"},
+  {ch:"🔁 Chem Rev. – Metals & Carbon",concept:"Reactivity series; metallurgy; organic reactions; nomenclature; soaps",practice:"25 mixed problems + 5 past paper questions"},
+  {ch:"📝 Chemistry Mock Test",concept:"Complete Chemistry mock: 35 marks, 60 min timed simulation",practice:"Full mock under exam conditions; thorough error analysis"},
+];
+
+const BIOLOGY_S = [
+  {ch:"Life Processes",concept:"Life processes intro; autotrophic nutrition; photosynthesis – equation, chlorophyll, stomata",practice:"Label leaf cross-section; write photosynthesis equation; 8 NCERT Q"},
+  {ch:"Life Processes",concept:"Heterotrophic nutrition; human digestion: mouth→stomach→SI→LI; enzymes & roles",practice:"Label digestive system; enzyme-substrate table; 8 questions"},
+  {ch:"Life Processes",concept:"Aerobic vs anaerobic respiration; ATP; breathing mechanism; yeast fermentation",practice:"Flowchart of aerobic respiration; fermentation diagram; 8 problems"},
+  {ch:"Life Processes",concept:"Transport in plants: xylem (water/minerals/transpiration pull); phloem (pressure flow)",practice:"Xylem vs phloem table; 8 NCERT questions; draw diagrams"},
+  {ch:"Life Processes",concept:"Circulatory system: blood components; 4-chambered heart; double circulation path",practice:"Label heart diagram; trace oxygenated/deoxygenated blood; 8 Q"},
+  {ch:"Life Processes",concept:"Excretion: kidney; nephron structure; urine formation; plant excretion methods",practice:"Label nephron diagram; trace urine formation steps; 8 questions"},
+  {ch:"Life Processes",concept:"Chapter revision + chapter test",practice:"Chapter test: 25 marks – diagrams + concept questions"},
+  {ch:"Control & Coordination",concept:"Neuron structure (axon, dendrite, myelin); types of neurons; synapse; impulse propagation",practice:"Label neuron diagram; 5 questions; NCERT Q1–4"},
+  {ch:"Control & Coordination",concept:"Reflex action & arc; voluntary vs involuntary actions; role of spinal cord",practice:"Draw complete reflex arc; label all components; 8 questions"},
+  {ch:"Control & Coordination",concept:"Brain: cerebrum (thinking), cerebellum (balance), medulla (involuntary)",practice:"Label brain with functions; 8 short-answer questions"},
+  {ch:"Control & Coordination",concept:"Endocrine glands & hormones (pituitary, thyroid, adrenal, pancreas); 5 plant hormones",practice:"Hormone table (gland→hormone→function); plant effects; 8 Q"},
+  {ch:"Control & Coordination",concept:"Chapter revision + chapter test",practice:"Chapter test: 20 marks – diagrams + hormones + reflex action"},
+  {ch:"How Organisms Reproduce",concept:"Why reproduction? DNA copying; asexual: binary fission, budding, fragmentation, spores",practice:"Diagrams of amoeba, yeast, Rhizopus; 8 questions"},
+  {ch:"How Organisms Reproduce",concept:"Vegetative propagation (natural & artificial); regeneration; tissue culture advantages",practice:"Examples table; advantages of asexual vs sexual; 8 questions"},
+  {ch:"How Organisms Reproduce",concept:"Sexual reproduction in plants: flower parts; pollination; fertilisation; seed & fruit",practice:"Label complete flower diagram; pollination types; 8 NCERT Q"},
+  {ch:"How Organisms Reproduce",concept:"Human male reproductive system: testes, epididymis, vas deferens, accessory glands",practice:"Label male reproductive diagram; spermatogenesis; 8 questions"},
+  {ch:"How Organisms Reproduce",concept:"Human female: ovaries, ovulation, fallopian tube, uterus; menstrual cycle",practice:"Label female reproductive diagram; trace egg journey; 8 Q"},
+  {ch:"How Organisms Reproduce",concept:"Reproductive health: puberty; STDs; contraception methods; chapter test",practice:"Chapter test: 20 marks – all reproduction modes + human systems"},
+  {ch:"Heredity",concept:"Variation & heredity; Mendel's experiments; monohybrid cross F₁, F₂ (3:1 ratio)",practice:"Punnett squares for 5 monohybrid crosses; 8 questions"},
+  {ch:"Heredity",concept:"Dihybrid cross (9:3:3:1 ratio); dominance; phenotype vs genotype",practice:"Punnett squares for 3 dihybrid crosses; 8 MCQs"},
+  {ch:"Heredity",concept:"Mendel's Laws: Segregation & Independent Assortment – statements & verification",practice:"5 genetics application problems; 8 past paper questions"},
+  {ch:"Heredity",concept:"Sex determination: XX/XY in humans; sex-linked traits; acquired vs inherited traits",practice:"Sex determination Punnett square; 8 past paper questions"},
+  {ch:"Heredity",concept:"Chapter revision + chapter test",practice:"Chapter test: 20 marks – crosses, laws, sex determination"},
+  {ch:"Our Environment",concept:"Ecosystem: biotic & abiotic; producers, consumers (1°/2°/3°), decomposers; food chain",practice:"Draw 4-level food web; 8 NCERT questions"},
+  {ch:"Our Environment",concept:"Trophic levels; 10% energy law; biomagnification; eutrophication effects",practice:"10% law calculations; biomagnification diagram; 8 questions"},
+  {ch:"Our Environment",concept:"Biodegradable vs non-biodegradable; ozone depletion; waste management; chapter test",practice:"Chapter test: 15 marks – ecosystems, energy flow, environment"},
+  {ch:"🔁 Bio Rev. – Life & Control",concept:"Life process diagrams (heart, nephron, digestive); hormone table; reflex arc recap",practice:"30 MCQs + 5 diagram-based questions from past papers"},
+  {ch:"🔁 Bio Rev. – Repro & Heredity",concept:"All reproduction modes; Mendel's laws; Punnett squares; ecosystem concepts",practice:"25 mixed problems + genetics Punnett square practice"},
+  {ch:"📝 Biology Mock Test",concept:"Complete Biology mock: 30 marks, 50 min timed simulation",practice:"Full mock under exam conditions; review all diagram errors"},
+];
+
+const dsOf = d => {
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+};
+const fmtDate  = d => d.toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
+const fmtDay   = d => d.toLocaleDateString("en-IN",{weekday:"short"});
+const fmtMonth = d => d.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+
+function generatePlan() {
+  const allWeekdays = [];
+  const cur = new Date("2025-04-15T12:00:00");
+  const end = new Date("2025-11-30T12:00:00");
+  while (cur <= end) {
+    const dow = cur.getDay();
+    if (dow > 0 && dow < 6) allWeekdays.push(new Date(cur));
+    cur.setDate(cur.getDate()+1);
+  }
+
+  const queues = {
+    Math:[...MATH_S], Physics:[...PHYSICS_S], Chemistry:[...CHEMISTRY_S], Biology:[...BIOLOGY_S]
+  };
+  let studyCount=0, friCount=0;
+  const plan=[];
+
+  for (const date of allWeekdays) {
+    const ds  = dsOf(date);
+    const dow = date.getDay();
+
+    if (HOLIDAYS.has(ds)) {
+      plan.push({date,ds,subject:"Holiday",ch:`🎉 ${HOLIDAY_NAMES[ds]||"Public Holiday"}`,
+        concept:"No study – public holiday",practice:"Rest and recharge!",type:"Holiday"});
+      continue;
+    }
+
+    studyCount++;
+
+    if (studyCount % 15 === 0) {
+      plan.push({date,ds,subject:"Buffer",ch:"🛡️ Buffer / Catch-Up Day",
+        concept:"Review any pending topics. Revisit difficult chapters. No new content today.",
+        practice:"Optional: redo a chapter test you found hard, or attempt a past paper section",type:"Buffer"});
+      continue;
+    }
+
+    if (dow === 5) {
+      friCount++;
+      if (friCount % 7 === 0) {
+        plan.push({date,ds,subject:"Mock",ch:"📝 Monthly Full-Syllabus Test",
+          concept:"Simulate board exam – cover all subjects studied so far",
+          practice:"3-hour mock → analyse results → list top 3 weak areas → plan targeted revision",type:"Mock"});
+        continue;
+      }
+      if (friCount % 3 === 0) {
+        plan.push({date,ds,subject:"Revision",ch:"🔁 Weekly Revision Day",
+          concept:"Quick recap of all 4 subjects covered this week – formulas, diagrams, definitions",
+          practice:"30 mixed MCQs (8 per subject) + 10 min flashcard review of all formulas",type:"Revision"});
+        continue;
+      }
+    }
+
+    const key = dow===1?"Math":dow===2?"Physics":dow===3?"Chemistry":dow===4?"Biology":"Math";
+    const session = queues[key]?.shift();
+    if (session) {
+      plan.push({date,ds,subject:key,ch:session.ch,concept:session.concept,practice:session.practice,type:"Study"});
+    } else {
+      plan.push({date,ds,subject:key,ch:`📚 ${key} – Free Practice`,
+        concept:"All chapters covered. Strengthen weak areas using past papers and exemplar problems.",
+        practice:"1 full past-year section for this subject + detailed solution review",type:"Revision"});
+    }
+  }
+  return plan;
+}
+
+const PLAN = generatePlan();
+
+export default function StudyPlan() {
+  const [activeMonth, setActiveMonth] = useState(null);
+  const [filter, setFilter]           = useState("All");
+  const [search, setSearch]           = useState("");
+  const [expanded, setExpanded]       = useState(null);
+
+  const {monthKeys, monthMap} = useMemo(()=>{
+    const mm = new Map();
+    for (const d of PLAN) {
+      const mk = fmtMonth(d.date);
+      if (!mm.has(mk)) mm.set(mk,[]);
+      mm.get(mk).push(d);
+    }
+    return {monthKeys:[...mm.keys()], monthMap:mm};
+  },[]);
+
+  const curMonth = activeMonth || monthKeys[0];
+
+  const stats = useMemo(()=>{
+    const c={};
+    for (const d of PLAN) c[d.subject]=(c[d.subject]||0)+1;
+    return c;
+  },[]);
+
+  const rows = useMemo(()=>{
+    const days = monthMap.get(curMonth)||[];
+    return days.filter(d=>{
+      if (filter!=="All" && d.subject!==filter) return false;
+      if (search){
+        const q=search.toLowerCase();
+        return d.ch?.toLowerCase().includes(q)||d.concept?.toLowerCase().includes(q);
+      }
+      return true;
+    });
+  },[curMonth,filter,search,monthMap]);
+
+  const totalStudy = (stats.Math||0)+(stats.Physics||0)+(stats.Chemistry||0)+(stats.Biology||0);
+
+  return (
+    <div style={{minHeight:"100vh",background:"#F1F5F9",fontFamily:"'Segoe UI',system-ui,sans-serif"}}>
+
+      {/* HEADER */}
+      <div style={{background:"linear-gradient(135deg,#1E3A5F 0%,#164E35 100%)",color:"#fff",padding:"20px 16px 18px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+          <span style={{fontSize:30}}>📚</span>
+          <div>
+            <h1 style={{margin:0,fontSize:17,fontWeight:800,letterSpacing:"-0.3px"}}>CBSE Board Exam Study Plan 2025</h1>
+            <p style={{margin:"3px 0 0",fontSize:11,opacity:.7}}>Mathematics · Physics · Chemistry · Biology &nbsp;|&nbsp; Apr 15 – Nov 30 · 90 min/day</p>
+          </div>
+        </div>
+
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+          {["Math","Physics","Chemistry","Biology"].map(s=>(
+            <div key={s} style={{background:"rgba(255,255,255,0.13)",borderRadius:10,padding:"8px 4px",textAlign:"center"}}>
+              <div style={{fontSize:18}}>{SC[s].emoji}</div>
+              <div style={{fontSize:22,fontWeight:800,lineHeight:1.1}}>{stats[s]||0}</div>
+              <div style={{fontSize:9,opacity:.7,marginTop:1}}>{s}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{display:"flex",flexWrap:"wrap",gap:"6px 14px",marginTop:12,fontSize:11,opacity:.75}}>
+          <span>🔁 {stats.Revision||0} revision</span>
+          <span>🛡️ {stats.Buffer||0} buffer</span>
+          <span>📝 {stats.Mock||0} mocks</span>
+          <span>🎉 {stats.Holiday||0} holidays</span>
+          <span>📅 {totalStudy} teaching days</span>
+        </div>
+      </div>
+
+      {/* FILTERS */}
+      <div style={{background:"#fff",borderBottom:"1px solid #E2E8F0",padding:"10px 12px",position:"sticky",top:0,zIndex:10,boxShadow:"0 1px 4px rgba(0,0,0,.06)"}}>
+        <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8}}>
+          {["All","Math","Physics","Chemistry","Biology","Revision","Buffer","Mock","Holiday"].map(s=>{
+            const cfg = SC[s]||{};
+            const active = filter===s;
+            return (
+              <button key={s} onClick={()=>setFilter(s)} style={{
+                padding:"4px 10px",borderRadius:20,fontSize:11,fontWeight:600,cursor:"pointer",
+                border:`1.5px solid ${active?(cfg.badge||"#1E3A5F"):"#E2E8F0"}`,
+                background:active?(cfg.badge||"#1E3A5F"):"#F8FAFC",
+                color:active?"#fff":(cfg.txt||"#64748B"),
+                transition:"all 0.15s"
+              }}>
+                {s!=="All"&&<span style={{marginRight:3}}>{cfg.emoji}</span>}{s}
+              </button>
+            );
+          })}
+        </div>
+        <input type="text" placeholder="🔍  Search chapter or topic…"
+          value={search} onChange={e=>setSearch(e.target.value)}
+          style={{width:"100%",border:"1.5px solid #E2E8F0",borderRadius:8,padding:"7px 12px",
+            fontSize:12,outline:"none",boxSizing:"border-box",background:"#F8FAFC",color:"#334155"}}/>
+      </div>
+
+      {/* MONTH TABS */}
+      <div style={{background:"#fff",borderBottom:"1px solid #E2E8F0",overflowX:"auto"}}>
+        <div style={{display:"flex",gap:2,padding:"8px 10px",minWidth:"max-content"}}>
+          {monthKeys.map(mk=>(
+            <button key={mk} onClick={()=>{setActiveMonth(mk);setExpanded(null);}} style={{
+              padding:"5px 13px",borderRadius:8,fontSize:11,fontWeight:700,cursor:"pointer",
+              border:"none",transition:"all 0.15s",whiteSpace:"nowrap",
+              background:curMonth===mk?"#1E3A5F":"transparent",
+              color:curMonth===mk?"#fff":"#64748B"
+            }}>
+              {mk.split(" ")[0]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* PLAN CARDS */}
+      <div style={{padding:"12px 12px 20px"}}>
+        <div style={{background:"#fff",borderRadius:14,border:"1px solid #E2E8F0",overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,.06)"}}>
+
+          <div style={{background:"#F8FAFC",padding:"10px 16px",borderBottom:"1px solid #E2E8F0",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontWeight:700,color:"#1E293B",fontSize:13}}>{curMonth}</span>
+            <span style={{fontSize:11,color:"#94A3B8"}}>{rows.length} {filter!=="All"?filter+" ":""}entries</span>
+          </div>
+
+          {rows.map((d,i)=>{
+            const cfg = SC[d.subject]||{};
+            const isOpen = expanded===d.ds;
+            return (
+              <div key={d.ds} onClick={()=>setExpanded(isOpen?null:d.ds)}
+                style={{borderBottom:"1px solid #F1F5F9",background:isOpen?(cfg.bg||"#fff"):"#fff",cursor:"pointer",
+                  transition:"background 0.15s"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 12px"}}>
+                  <div style={{minWidth:22,fontSize:11,color:"#CBD5E1",fontWeight:600,textAlign:"right"}}>{i+1}</div>
+                  <div style={{minWidth:72,fontSize:11,color:"#64748B",fontWeight:500}}>{fmtDate(d.date)}</div>
+                  <div style={{minWidth:28,fontSize:10,color:"#94A3B8"}}>{fmtDay(d.date)}</div>
+                  <div style={{minWidth:20,fontSize:14,textAlign:"center"}}>{cfg.emoji}</div>
+                  <div style={{flex:1,fontSize:12,fontWeight:600,color:"#1E293B",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                    {d.ch}
+                  </div>
+                  <span style={{fontSize:10,background:cfg.badge,color:"#fff",padding:"2px 7px",borderRadius:10,fontWeight:700,whiteSpace:"nowrap",marginLeft:4,display:isOpen?"none":"inline"}}>
+                    {d.subject}
+                  </span>
+                  <div style={{fontSize:11,color:"#CBD5E1",fontWeight:700,marginLeft:2}}>{isOpen?"▲":"▼"}</div>
+                </div>
+
+                {isOpen && (
+                  <div style={{padding:"0 12px 14px 62px",display:"flex",flexDirection:"column",gap:8}}>
+                    <div style={{background:"rgba(255,255,255,.8)",borderRadius:10,padding:"10px 12px",border:`1.5px solid ${cfg.border||"#E2E8F0"}`}}>
+                      <div style={{fontSize:10,fontWeight:800,color:cfg.txt||"#64748B",marginBottom:4,textTransform:"uppercase",letterSpacing:.6}}>📖 Concept · 30 min</div>
+                      <div style={{fontSize:12,color:"#334155",lineHeight:1.65}}>{d.concept}</div>
+                    </div>
+                    <div style={{background:"rgba(255,255,255,.8)",borderRadius:10,padding:"10px 12px",border:`1.5px solid ${cfg.border||"#E2E8F0"}`}}>
+                      <div style={{fontSize:10,fontWeight:800,color:cfg.txt||"#64748B",marginBottom:4,textTransform:"uppercase",letterSpacing:.6}}>✏️ Practice · 60 min</div>
+                      <div style={{fontSize:12,color:"#334155",lineHeight:1.65}}>{d.practice}</div>
+                    </div>
+                    <div>
+                      <span style={{background:cfg.badge,color:"#fff",padding:"3px 9px",borderRadius:12,fontSize:10,fontWeight:700}}>
+                        {cfg.emoji} {cfg.label||d.subject}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {rows.length===0&&(
+            <div style={{padding:"48px 20px",textAlign:"center",color:"#94A3B8",fontSize:13}}>
+              No entries match your filter or search
+            </div>
+          )}
+        </div>
+
+        {/* PLAN STRUCTURE */}
+        <div style={{marginTop:12,background:"#fff",borderRadius:14,border:"1px solid #E2E8F0",padding:16,boxShadow:"0 1px 3px rgba(0,0,0,.04)"}}>
+          <div style={{fontWeight:800,color:"#1E293B",fontSize:13,marginBottom:10}}>📌 How This Plan Works</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:12}}>
+            {Object.entries(SC).map(([k,v])=>(
+              <div key={k} style={{display:"flex",alignItems:"center",gap:7,padding:"6px 8px",borderRadius:8,background:v.bg,border:`1px solid ${v.border}`,fontSize:11}}>
+                <span>{v.emoji}</span>
+                <span style={{fontWeight:700,color:v.txt}}>{v.label||k}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{fontSize:11.5,color:"#475569",lineHeight:2}}>
+            <p style={{margin:"2px 0"}}>⏱️ <b>Daily:</b> 30 min concept study → 60 min practice questions</p>
+            <p style={{margin:"2px 0"}}>📅 <b>Weekly rotation:</b> Mon=Math · Tue=Physics · Wed=Chemistry · Thu=Biology · Fri=Math/Revision</p>
+            <p style={{margin:"2px 0"}}>🔁 <b>Every 3rd Friday:</b> Full weekly revision across all 4 subjects</p>
+            <p style={{margin:"2px 0"}}>📝 <b>Every 7th Friday:</b> Monthly full-syllabus mock test (3 hours)</p>
+            <p style={{margin:"2px 0"}}>🛡️ <b>Every 15th study day:</b> Buffer/catch-up day (no new content)</p>
+            <p style={{margin:"2px 0"}}>🎉 <b>Public holidays excluded:</b> Good Friday, Labour Day, Independence Day, Gandhi Jayanti, Diwali (2 days), Guru Nanak Jayanti</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
