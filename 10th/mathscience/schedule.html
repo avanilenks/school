@@ -1,13 +1,13 @@
 import { useState, useMemo } from "react";
 
 const HOLIDAYS = new Set([
-  "2025-04-18","2025-05-01","2025-08-15","2025-10-02",
-  "2025-10-20","2025-10-21","2025-11-05"
+  "2026-04-03","2026-05-01","2026-08-15","2026-10-02",
+  "2026-10-19","2026-10-20","2026-11-15"
 ]);
 const HOLIDAY_NAMES = {
-  "2025-04-18":"Good Friday","2025-05-01":"Labour Day",
-  "2025-08-15":"Independence Day","2025-10-02":"Gandhi Jayanti",
-  "2025-10-20":"Diwali","2025-10-21":"Diwali (2nd day)","2025-11-05":"Guru Nanak Jayanti"
+  "2026-04-03":"Good Friday","2026-05-01":"Labour Day",
+  "2026-08-15":"Independence Day","2026-10-02":"Gandhi Jayanti",
+  "2026-10-19":"Diwali","2026-10-20":"Diwali (2nd day)","2026-11-15":"Guru Nanak Jayanti"
 };
 
 const SC = {
@@ -177,8 +177,8 @@ const fmtMonth = d => d.toLocaleDateString("en-IN",{month:"long",year:"numeric"}
 
 function generatePlan() {
   const allWeekdays = [];
-  const cur = new Date("2025-04-15T12:00:00");
-  const end = new Date("2025-11-30T12:00:00");
+  const cur = new Date("2026-04-15T12:00:00");
+  const end = new Date("2026-11-30T12:00:00");
   while (cur <= end) {
     const dow = cur.getDay();
     if (dow > 0 && dow < 6) allWeekdays.push(new Date(cur));
@@ -287,8 +287,8 @@ export default function StudyPlan() {
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
           <span style={{fontSize:30}}>📚</span>
           <div>
-            <h1 style={{margin:0,fontSize:17,fontWeight:800,letterSpacing:"-0.3px"}}>CBSE Board Exam Study Plan 2025</h1>
-            <p style={{margin:"3px 0 0",fontSize:11,opacity:.7}}>Mathematics · Physics · Chemistry · Biology &nbsp;|&nbsp; Apr 15 – Nov 30 · 90 min/day</p>
+            <h1 style={{margin:0,fontSize:17,fontWeight:800,letterSpacing:"-0.3px"}}>CBSE Board Exam Study Plan 2026</h1>
+            <p style={{margin:"3px 0 0",fontSize:11,opacity:.7}}>Mathematics · Physics · Chemistry · Biology &nbsp;|&nbsp; Apr 15 – Nov 30, 2026 · 90 min/day</p>
           </div>
         </div>
 
