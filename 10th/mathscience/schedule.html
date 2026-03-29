@@ -1,27 +1,134 @@
-import { useState, useMemo } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CBSE Board Exam Study Plan 2026</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#F1F5F9;min-height:100vh;color:#1E293B}
+  /* HEADER */
+  #header{background:linear-gradient(135deg,#1E3A5F 0%,#164E35 100%);color:#fff;padding:20px 16px 18px}
+  #header h1{font-size:17px;font-weight:800;letter-spacing:-.3px}
+  #header p{font-size:11px;opacity:.7;margin-top:3px}
+  #header-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  #stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .stat-box{background:rgba(255,255,255,.13);border-radius:10px;padding:8px 4px;text-align:center}
+  .stat-box .emoji{font-size:18px}
+  .stat-box .num{font-size:22px;font-weight:800;line-height:1.1}
+  .stat-box .lbl{font-size:9px;opacity:.7;margin-top:1px}
+  #sub-stats{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:11px;opacity:.75}
+  /* FILTERS */
+  #filter-bar{background:#fff;border-bottom:1px solid #E2E8F0;padding:10px 12px;position:sticky;top:0;z-index:10;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  #filter-btns{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .fbtn{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:all .15s}
+  #search{width:100%;border:1.5px solid #E2E8F0;border-radius:8px;padding:7px 12px;font-size:12px;outline:none;background:#F8FAFC;color:#334155}
+  /* MONTH TABS */
+  #month-tabs{background:#fff;border-bottom:1px solid #E2E8F0;overflow-x:auto}
+  #month-inner{display:flex;gap:2px;padding:8px 10px;min-width:max-content}
+  .mtab{padding:5px 13px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:#64748B;transition:all .15s}
+  .mtab.active{background:#1E3A5F;color:#fff}
+  /* PLAN */
+  #plan-wrap{padding:12px 12px 20px}
+  #plan-card{background:#fff;border-radius:14px;border:1px solid #E2E8F0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  #month-hdr{background:#F8FAFC;padding:10px 16px;border-bottom:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center}
+  #month-hdr span:first-child{font-weight:700;color:#1E293B;font-size:13px}
+  #month-hdr span:last-child{font-size:11px;color:#94A3B8}
+  .row{border-bottom:1px solid #F1F5F9;cursor:pointer;transition:background .15s}
+  .row-summary{display:flex;align-items:center;gap:8px;padding:10px 12px}
+  .row-num{min-width:22px;font-size:11px;color:#CBD5E1;font-weight:600;text-align:right}
+  .row-date{min-width:72px;font-size:11px;color:#64748B;font-weight:500}
+  .row-dow{min-width:28px;font-size:10px;color:#94A3B8}
+  .row-emoji{min-width:20px;font-size:14px;text-align:center}
+  .row-ch{flex:1;font-size:12px;font-weight:600;color:#1E293B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row-badge{font-size:10px;color:#fff;padding:2px 7px;border-radius:10px;font-weight:700;white-space:nowrap;margin-left:4px}
+  .row-arrow{font-size:11px;color:#CBD5E1;font-weight:700;margin-left:2px}
+  .row-detail{padding:0 12px 14px 62px;display:flex;flex-direction:column;gap:8px}
+  .detail-box{border-radius:10px;padding:10px 12px;border-width:1.5px;border-style:solid}
+  .detail-lbl{font-size:10px;font-weight:800;margin-bottom:4px;text-transform:uppercase;letter-spacing:.6px}
+  .detail-txt{font-size:12px;color:#334155;line-height:1.65}
+  .detail-chip{padding:3px 9px;border-radius:12px;font-size:10px;font-weight:700;color:#fff}
+  #empty{padding:48px 20px;text-align:center;color:#94A3B8;font-size:13px;display:none}
+  /* HOW IT WORKS */
+  #how{margin-top:12px;background:#fff;border-radius:14px;border:1px solid #E2E8F0;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #how h2{font-weight:800;color:#1E293B;font-size:13px;margin-bottom:10px}
+  #legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+  .leg-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:8px;font-size:11px;border-width:1px;border-style:solid}
+  .leg-lbl{font-weight:700}
+  #how ul{font-size:11.5px;color:#475569;line-height:2;list-style:none}
+</style>
+</head>
+<body>
 
-const HOLIDAYS = new Set([
-  "2026-04-03","2026-05-01","2026-08-15","2026-10-02",
-  "2026-10-19","2026-10-20","2026-11-15"
-]);
-const HOLIDAY_NAMES = {
+<div id="header">
+  <div id="header-top">
+    <span style="font-size:30px">📚</span>
+    <div>
+      <h1>CBSE Board Exam Study Plan 2026</h1>
+      <p>Mathematics · Physics · Chemistry · Biology &nbsp;|&nbsp; Apr 15 – Nov 30, 2026 · 90 min/day</p>
+    </div>
+  </div>
+  <div id="stats-grid">
+    <div class="stat-box"><div class="emoji">📐</div><div class="num" id="s-Math">0</div><div class="lbl">Math</div></div>
+    <div class="stat-box"><div class="emoji">⚡</div><div class="num" id="s-Physics">0</div><div class="lbl">Physics</div></div>
+    <div class="stat-box"><div class="emoji">🧪</div><div class="num" id="s-Chemistry">0</div><div class="lbl">Chemistry</div></div>
+    <div class="stat-box"><div class="emoji">🌿</div><div class="num" id="s-Biology">0</div><div class="lbl">Biology</div></div>
+  </div>
+  <div id="sub-stats">
+    <span>🔁 <span id="s-Revision">0</span> revision</span>
+    <span>🛡️ <span id="s-Buffer">0</span> buffer</span>
+    <span>📝 <span id="s-Mock">0</span> mocks</span>
+    <span>🎉 <span id="s-Holiday">0</span> holidays</span>
+    <span>📅 <span id="s-Total">0</span> teaching days</span>
+  </div>
+</div>
+
+<div id="filter-bar">
+  <div id="filter-btns"></div>
+  <input id="search" type="text" placeholder="🔍  Search chapter or topic…"/>
+</div>
+
+<div id="month-tabs"><div id="month-inner"></div></div>
+
+<div id="plan-wrap">
+  <div id="plan-card">
+    <div id="month-hdr"><span id="mhdr-title"></span><span id="mhdr-count"></span></div>
+    <div id="rows-container"></div>
+    <div id="empty">No entries match your filter or search</div>
+  </div>
+  <div id="how">
+    <h2>📌 How This Plan Works</h2>
+    <div id="legend"></div>
+    <ul>
+      <li>⏱️ <b>Daily:</b> 30 min concept study → 60 min practice questions</li>
+      <li>📅 <b>Weekly rotation:</b> Mon=Math · Tue=Physics · Wed=Chemistry · Thu=Biology · Fri=Math/Revision</li>
+      <li>🔁 <b>Every 3rd Friday:</b> Full weekly revision across all 4 subjects</li>
+      <li>📝 <b>Every 7th Friday:</b> Monthly full-syllabus mock test (3 hours)</li>
+      <li>🛡️ <b>Every 15th study day:</b> Buffer/catch-up day (no new content)</li>
+      <li>🎉 <b>Public holidays excluded:</b> Good Friday, Labour Day, Independence Day, Gandhi Jayanti, Diwali (2 days), Guru Nanak Jayanti</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const HOLIDAYS = {
   "2026-04-03":"Good Friday","2026-05-01":"Labour Day",
   "2026-08-15":"Independence Day","2026-10-02":"Gandhi Jayanti",
   "2026-10-19":"Diwali","2026-10-20":"Diwali (2nd day)","2026-11-15":"Guru Nanak Jayanti"
 };
 
 const SC = {
-  Math:     {emoji:"📐",label:"Mathematics", bg:"#EFF6FF",badge:"#2563EB",border:"#BFDBFE",txt:"#1D4ED8"},
-  Physics:  {emoji:"⚡",label:"Physics",     bg:"#FFFBEB",badge:"#D97706",border:"#FDE68A",txt:"#92400E"},
-  Chemistry:{emoji:"🧪",label:"Chemistry",   bg:"#F0FDF4",badge:"#16A34A",border:"#BBF7D0",txt:"#14532D"},
-  Biology:  {emoji:"🌿",label:"Biology",     bg:"#FAF5FF",badge:"#7C3AED",border:"#DDD6FE",txt:"#4C1D95"},
-  Revision: {emoji:"🔁",label:"Revision",    bg:"#F8FAFC",badge:"#475569",border:"#CBD5E1",txt:"#334155"},
-  Buffer:   {emoji:"🛡️",label:"Buffer Day",  bg:"#F1F5F9",badge:"#94A3B8",border:"#E2E8F0",txt:"#475569"},
-  Mock:     {emoji:"📝",label:"Mock Test",   bg:"#FFF1F2",badge:"#E11D48",border:"#FECDD3",txt:"#9F1239"},
-  Holiday:  {emoji:"🎉",label:"Holiday",     bg:"#FFF7ED",badge:"#EA580C",border:"#FED7AA",txt:"#7C2D12"},
+  Math:     {emoji:"📐",label:"Mathematics",bg:"#EFF6FF",badge:"#2563EB",border:"#BFDBFE",txt:"#1D4ED8"},
+  Physics:  {emoji:"⚡",label:"Physics",    bg:"#FFFBEB",badge:"#D97706",border:"#FDE68A",txt:"#92400E"},
+  Chemistry:{emoji:"🧪",label:"Chemistry",  bg:"#F0FDF4",badge:"#16A34A",border:"#BBF7D0",txt:"#14532D"},
+  Biology:  {emoji:"🌿",label:"Biology",    bg:"#FAF5FF",badge:"#7C3AED",border:"#DDD6FE",txt:"#4C1D95"},
+  Revision: {emoji:"🔁",label:"Revision",   bg:"#F8FAFC",badge:"#475569",border:"#CBD5E1",txt:"#334155"},
+  Buffer:   {emoji:"🛡️",label:"Buffer Day", bg:"#F1F5F9",badge:"#94A3B8",border:"#E2E8F0",txt:"#475569"},
+  Mock:     {emoji:"📝",label:"Mock Test",  bg:"#FFF1F2",badge:"#E11D48",border:"#FECDD3",txt:"#9F1239"},
+  Holiday:  {emoji:"🎉",label:"Holiday",    bg:"#FFF7ED",badge:"#EA580C",border:"#FED7AA",txt:"#7C2D12"},
 };
 
-const MATH_S = [
+const MATH_S=[
   {ch:"Real Numbers",concept:"Fundamental Theorem of Arithmetic – prime factorization; HCF & LCM via factorization",practice:"NCERT Ex 1.1 – 10 HCF/LCM problems using prime factorization"},
   {ch:"Real Numbers",concept:"Proving irrationality of √2, √3, √5 using contradiction method",practice:"NCERT Ex 1.2 – 5 irrationality proofs + 5 decimal expansion MCQs"},
   {ch:"Real Numbers",concept:"Terminating vs non-terminating decimals; chapter recap",practice:"Chapter mini-test: 15 mixed questions (MCQ + short answer)"},
@@ -73,7 +180,7 @@ const MATH_S = [
   {ch:"📝 Math Mock Test 2",concept:"Second full mock + targeted weak-area revision",practice:"Identify top 3 weak chapters → revise → attempt 1 past paper"},
 ];
 
-const PHYSICS_S = [
+const PHYSICS_S=[
   {ch:"Light – Reflection",concept:"Laws of reflection; spherical mirrors: pole, focus, C, R; concave vs convex",practice:"Draw all 6 ray diagrams for concave mirror; label all key points"},
   {ch:"Light – Reflection",concept:"Image formation: concave mirror – all 6 object positions with characteristics",practice:"Complete image-formation table; 3 labelled ray diagrams"},
   {ch:"Light – Reflection",concept:"Image formation: convex mirror; uses of mirrors (torch, headlights, rear-view)",practice:"2 convex mirror ray diagrams; 5 MCQs on mirror applications"},
@@ -105,7 +212,7 @@ const PHYSICS_S = [
   {ch:"📝 Physics Mock Test",concept:"Complete Physics mock: 35 marks, 60 min timed simulation",practice:"Attempt full paper under exam conditions; analyse all errors"},
 ];
 
-const CHEMISTRY_S = [
+const CHEMISTRY_S=[
   {ch:"Chemical Reactions",concept:"Signs of chemical change; writing skeleton equations; balancing by conservation",practice:"NCERT Ex 1.1 – balance 10 equations; identify reactants/products"},
   {ch:"Chemical Reactions",concept:"Types: combination, decomposition (thermal/electrolytic/photolytic), displacement",practice:"NCERT Ex 1.2 – write & classify 10 reactions with observations"},
   {ch:"Chemical Reactions",concept:"Double displacement, precipitation, neutralisation reactions + observations",practice:"NCERT Ex 1.3 – 8 reaction-type identification problems"},
@@ -135,7 +242,7 @@ const CHEMISTRY_S = [
   {ch:"📝 Chemistry Mock Test",concept:"Complete Chemistry mock: 35 marks, 60 min timed simulation",practice:"Full mock under exam conditions; thorough error analysis"},
 ];
 
-const BIOLOGY_S = [
+const BIOLOGY_S=[
   {ch:"Life Processes",concept:"Life processes intro; autotrophic nutrition; photosynthesis – equation, chlorophyll, stomata",practice:"Label leaf cross-section; write photosynthesis equation; 8 NCERT Q"},
   {ch:"Life Processes",concept:"Heterotrophic nutrition; human digestion: mouth→stomach→SI→LI; enzymes & roles",practice:"Label digestive system; enzyme-substrate table; 8 questions"},
   {ch:"Life Processes",concept:"Aerobic vs anaerobic respiration; ATP; breathing mechanism; yeast fermentation",practice:"Flowchart of aerobic respiration; fermentation diagram; 8 problems"},
@@ -167,270 +274,173 @@ const BIOLOGY_S = [
   {ch:"📝 Biology Mock Test",concept:"Complete Biology mock: 30 marks, 50 min timed simulation",practice:"Full mock under exam conditions; review all diagram errors"},
 ];
 
-const dsOf = d => {
-  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+function dsOf(d){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),dd=String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${dd}`;
-};
-const fmtDate  = d => d.toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
-const fmtDay   = d => d.toLocaleDateString("en-IN",{weekday:"short"});
-const fmtMonth = d => d.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+}
+function fmtDate(d){return d.toLocaleDateString("en-IN",{day:"2-digit",month:"short"});}
+function fmtDay(d){return d.toLocaleDateString("en-IN",{weekday:"short"});}
+function fmtMonth(d){return d.toLocaleDateString("en-IN",{month:"long",year:"numeric"});}
 
-function generatePlan() {
-  const allWeekdays = [];
-  const cur = new Date("2026-04-15T12:00:00");
-  const end = new Date("2026-11-30T12:00:00");
-  while (cur <= end) {
-    const dow = cur.getDay();
-    if (dow > 0 && dow < 6) allWeekdays.push(new Date(cur));
-    cur.setDate(cur.getDate()+1);
-  }
-
-  const queues = {
-    Math:[...MATH_S], Physics:[...PHYSICS_S], Chemistry:[...CHEMISTRY_S], Biology:[...BIOLOGY_S]
-  };
-  let studyCount=0, friCount=0;
+function generatePlan(){
+  const days=[];
+  const cur=new Date("2026-04-15T12:00:00"),end=new Date("2026-11-30T12:00:00");
+  while(cur<=end){const dow=cur.getDay();if(dow>0&&dow<6)days.push(new Date(cur));cur.setDate(cur.getDate()+1);}
+  const queues={Math:[...MATH_S],Physics:[...PHYSICS_S],Chemistry:[...CHEMISTRY_S],Biology:[...BIOLOGY_S]};
+  let studyCount=0,friCount=0;
   const plan=[];
-
-  for (const date of allWeekdays) {
-    const ds  = dsOf(date);
-    const dow = date.getDay();
-
-    if (HOLIDAYS.has(ds)) {
-      plan.push({date,ds,subject:"Holiday",ch:`🎉 ${HOLIDAY_NAMES[ds]||"Public Holiday"}`,
-        concept:"No study – public holiday",practice:"Rest and recharge!",type:"Holiday"});
+  for(const date of days){
+    const ds=dsOf(date),dow=date.getDay();
+    if(HOLIDAYS[ds]){
+      plan.push({date,ds,subject:"Holiday",ch:`🎉 ${HOLIDAYS[ds]}`,concept:"No study – public holiday",practice:"Rest and recharge!",type:"Holiday"});
       continue;
     }
-
     studyCount++;
-
-    if (studyCount % 15 === 0) {
-      plan.push({date,ds,subject:"Buffer",ch:"🛡️ Buffer / Catch-Up Day",
-        concept:"Review any pending topics. Revisit difficult chapters. No new content today.",
-        practice:"Optional: redo a chapter test you found hard, or attempt a past paper section",type:"Buffer"});
+    if(studyCount%15===0){
+      plan.push({date,ds,subject:"Buffer",ch:"🛡️ Buffer / Catch-Up Day",concept:"Review any pending topics. No new content today.",practice:"Optional: redo a chapter test you found hard, or attempt a past paper section",type:"Buffer"});
       continue;
     }
-
-    if (dow === 5) {
+    if(dow===5){
       friCount++;
-      if (friCount % 7 === 0) {
-        plan.push({date,ds,subject:"Mock",ch:"📝 Monthly Full-Syllabus Test",
-          concept:"Simulate board exam – cover all subjects studied so far",
-          practice:"3-hour mock → analyse results → list top 3 weak areas → plan targeted revision",type:"Mock"});
-        continue;
-      }
-      if (friCount % 3 === 0) {
-        plan.push({date,ds,subject:"Revision",ch:"🔁 Weekly Revision Day",
-          concept:"Quick recap of all 4 subjects covered this week – formulas, diagrams, definitions",
-          practice:"30 mixed MCQs (8 per subject) + 10 min flashcard review of all formulas",type:"Revision"});
-        continue;
-      }
+      if(friCount%7===0){plan.push({date,ds,subject:"Mock",ch:"📝 Monthly Full-Syllabus Test",concept:"Simulate board exam – cover all subjects studied so far",practice:"3-hour mock → analyse results → list top 3 weak areas → plan targeted revision",type:"Mock"});continue;}
+      if(friCount%3===0){plan.push({date,ds,subject:"Revision",ch:"🔁 Weekly Revision Day",concept:"Quick recap of all 4 subjects – formulas, diagrams, definitions",practice:"30 mixed MCQs (8 per subject) + 10 min flashcard review",type:"Revision"});continue;}
     }
-
-    const key = dow===1?"Math":dow===2?"Physics":dow===3?"Chemistry":dow===4?"Biology":"Math";
-    const session = queues[key]?.shift();
-    if (session) {
-      plan.push({date,ds,subject:key,ch:session.ch,concept:session.concept,practice:session.practice,type:"Study"});
-    } else {
-      plan.push({date,ds,subject:key,ch:`📚 ${key} – Free Practice`,
-        concept:"All chapters covered. Strengthen weak areas using past papers and exemplar problems.",
-        practice:"1 full past-year section for this subject + detailed solution review",type:"Revision"});
-    }
+    const key=dow===1?"Math":dow===2?"Physics":dow===3?"Chemistry":dow===4?"Biology":"Math";
+    const s=queues[key]?.shift();
+    if(s) plan.push({date,ds,subject:key,ch:s.ch,concept:s.concept,practice:s.practice,type:"Study"});
+    else plan.push({date,ds,subject:key,ch:`📚 ${key} – Free Practice`,concept:"All chapters covered. Strengthen weak areas using past papers.",practice:"1 full past-year section + detailed solution review",type:"Revision"});
   }
   return plan;
 }
 
-const PLAN = generatePlan();
+const PLAN=generatePlan();
 
-export default function StudyPlan() {
-  const [activeMonth, setActiveMonth] = useState(null);
-  const [filter, setFilter]           = useState("All");
-  const [search, setSearch]           = useState("");
-  const [expanded, setExpanded]       = useState(null);
-
-  const {monthKeys, monthMap} = useMemo(()=>{
-    const mm = new Map();
-    for (const d of PLAN) {
-      const mk = fmtMonth(d.date);
-      if (!mm.has(mk)) mm.set(mk,[]);
-      mm.get(mk).push(d);
-    }
-    return {monthKeys:[...mm.keys()], monthMap:mm};
-  },[]);
-
-  const curMonth = activeMonth || monthKeys[0];
-
-  const stats = useMemo(()=>{
-    const c={};
-    for (const d of PLAN) c[d.subject]=(c[d.subject]||0)+1;
-    return c;
-  },[]);
-
-  const rows = useMemo(()=>{
-    const days = monthMap.get(curMonth)||[];
-    return days.filter(d=>{
-      if (filter!=="All" && d.subject!==filter) return false;
-      if (search){
-        const q=search.toLowerCase();
-        return d.ch?.toLowerCase().includes(q)||d.concept?.toLowerCase().includes(q);
-      }
-      return true;
-    });
-  },[curMonth,filter,search,monthMap]);
-
-  const totalStudy = (stats.Math||0)+(stats.Physics||0)+(stats.Chemistry||0)+(stats.Biology||0);
-
-  return (
-    <div style={{minHeight:"100vh",background:"#F1F5F9",fontFamily:"'Segoe UI',system-ui,sans-serif"}}>
-
-      {/* HEADER */}
-      <div style={{background:"linear-gradient(135deg,#1E3A5F 0%,#164E35 100%)",color:"#fff",padding:"20px 16px 18px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
-          <span style={{fontSize:30}}>📚</span>
-          <div>
-            <h1 style={{margin:0,fontSize:17,fontWeight:800,letterSpacing:"-0.3px"}}>CBSE Board Exam Study Plan 2026</h1>
-            <p style={{margin:"3px 0 0",fontSize:11,opacity:.7}}>Mathematics · Physics · Chemistry · Biology &nbsp;|&nbsp; Apr 15 – Nov 30, 2026 · 90 min/day</p>
-          </div>
-        </div>
-
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
-          {["Math","Physics","Chemistry","Biology"].map(s=>(
-            <div key={s} style={{background:"rgba(255,255,255,0.13)",borderRadius:10,padding:"8px 4px",textAlign:"center"}}>
-              <div style={{fontSize:18}}>{SC[s].emoji}</div>
-              <div style={{fontSize:22,fontWeight:800,lineHeight:1.1}}>{stats[s]||0}</div>
-              <div style={{fontSize:9,opacity:.7,marginTop:1}}>{s}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{display:"flex",flexWrap:"wrap",gap:"6px 14px",marginTop:12,fontSize:11,opacity:.75}}>
-          <span>🔁 {stats.Revision||0} revision</span>
-          <span>🛡️ {stats.Buffer||0} buffer</span>
-          <span>📝 {stats.Mock||0} mocks</span>
-          <span>🎉 {stats.Holiday||0} holidays</span>
-          <span>📅 {totalStudy} teaching days</span>
-        </div>
-      </div>
-
-      {/* FILTERS */}
-      <div style={{background:"#fff",borderBottom:"1px solid #E2E8F0",padding:"10px 12px",position:"sticky",top:0,zIndex:10,boxShadow:"0 1px 4px rgba(0,0,0,.06)"}}>
-        <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:8}}>
-          {["All","Math","Physics","Chemistry","Biology","Revision","Buffer","Mock","Holiday"].map(s=>{
-            const cfg = SC[s]||{};
-            const active = filter===s;
-            return (
-              <button key={s} onClick={()=>setFilter(s)} style={{
-                padding:"4px 10px",borderRadius:20,fontSize:11,fontWeight:600,cursor:"pointer",
-                border:`1.5px solid ${active?(cfg.badge||"#1E3A5F"):"#E2E8F0"}`,
-                background:active?(cfg.badge||"#1E3A5F"):"#F8FAFC",
-                color:active?"#fff":(cfg.txt||"#64748B"),
-                transition:"all 0.15s"
-              }}>
-                {s!=="All"&&<span style={{marginRight:3}}>{cfg.emoji}</span>}{s}
-              </button>
-            );
-          })}
-        </div>
-        <input type="text" placeholder="🔍  Search chapter or topic…"
-          value={search} onChange={e=>setSearch(e.target.value)}
-          style={{width:"100%",border:"1.5px solid #E2E8F0",borderRadius:8,padding:"7px 12px",
-            fontSize:12,outline:"none",boxSizing:"border-box",background:"#F8FAFC",color:"#334155"}}/>
-      </div>
-
-      {/* MONTH TABS */}
-      <div style={{background:"#fff",borderBottom:"1px solid #E2E8F0",overflowX:"auto"}}>
-        <div style={{display:"flex",gap:2,padding:"8px 10px",minWidth:"max-content"}}>
-          {monthKeys.map(mk=>(
-            <button key={mk} onClick={()=>{setActiveMonth(mk);setExpanded(null);}} style={{
-              padding:"5px 13px",borderRadius:8,fontSize:11,fontWeight:700,cursor:"pointer",
-              border:"none",transition:"all 0.15s",whiteSpace:"nowrap",
-              background:curMonth===mk?"#1E3A5F":"transparent",
-              color:curMonth===mk?"#fff":"#64748B"
-            }}>
-              {mk.split(" ")[0]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* PLAN CARDS */}
-      <div style={{padding:"12px 12px 20px"}}>
-        <div style={{background:"#fff",borderRadius:14,border:"1px solid #E2E8F0",overflow:"hidden",boxShadow:"0 2px 8px rgba(0,0,0,.06)"}}>
-
-          <div style={{background:"#F8FAFC",padding:"10px 16px",borderBottom:"1px solid #E2E8F0",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <span style={{fontWeight:700,color:"#1E293B",fontSize:13}}>{curMonth}</span>
-            <span style={{fontSize:11,color:"#94A3B8"}}>{rows.length} {filter!=="All"?filter+" ":""}entries</span>
-          </div>
-
-          {rows.map((d,i)=>{
-            const cfg = SC[d.subject]||{};
-            const isOpen = expanded===d.ds;
-            return (
-              <div key={d.ds} onClick={()=>setExpanded(isOpen?null:d.ds)}
-                style={{borderBottom:"1px solid #F1F5F9",background:isOpen?(cfg.bg||"#fff"):"#fff",cursor:"pointer",
-                  transition:"background 0.15s"}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 12px"}}>
-                  <div style={{minWidth:22,fontSize:11,color:"#CBD5E1",fontWeight:600,textAlign:"right"}}>{i+1}</div>
-                  <div style={{minWidth:72,fontSize:11,color:"#64748B",fontWeight:500}}>{fmtDate(d.date)}</div>
-                  <div style={{minWidth:28,fontSize:10,color:"#94A3B8"}}>{fmtDay(d.date)}</div>
-                  <div style={{minWidth:20,fontSize:14,textAlign:"center"}}>{cfg.emoji}</div>
-                  <div style={{flex:1,fontSize:12,fontWeight:600,color:"#1E293B",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
-                    {d.ch}
-                  </div>
-                  <span style={{fontSize:10,background:cfg.badge,color:"#fff",padding:"2px 7px",borderRadius:10,fontWeight:700,whiteSpace:"nowrap",marginLeft:4,display:isOpen?"none":"inline"}}>
-                    {d.subject}
-                  </span>
-                  <div style={{fontSize:11,color:"#CBD5E1",fontWeight:700,marginLeft:2}}>{isOpen?"▲":"▼"}</div>
-                </div>
-
-                {isOpen && (
-                  <div style={{padding:"0 12px 14px 62px",display:"flex",flexDirection:"column",gap:8}}>
-                    <div style={{background:"rgba(255,255,255,.8)",borderRadius:10,padding:"10px 12px",border:`1.5px solid ${cfg.border||"#E2E8F0"}`}}>
-                      <div style={{fontSize:10,fontWeight:800,color:cfg.txt||"#64748B",marginBottom:4,textTransform:"uppercase",letterSpacing:.6}}>📖 Concept · 30 min</div>
-                      <div style={{fontSize:12,color:"#334155",lineHeight:1.65}}>{d.concept}</div>
-                    </div>
-                    <div style={{background:"rgba(255,255,255,.8)",borderRadius:10,padding:"10px 12px",border:`1.5px solid ${cfg.border||"#E2E8F0"}`}}>
-                      <div style={{fontSize:10,fontWeight:800,color:cfg.txt||"#64748B",marginBottom:4,textTransform:"uppercase",letterSpacing:.6}}>✏️ Practice · 60 min</div>
-                      <div style={{fontSize:12,color:"#334155",lineHeight:1.65}}>{d.practice}</div>
-                    </div>
-                    <div>
-                      <span style={{background:cfg.badge,color:"#fff",padding:"3px 9px",borderRadius:12,fontSize:10,fontWeight:700}}>
-                        {cfg.emoji} {cfg.label||d.subject}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {rows.length===0&&(
-            <div style={{padding:"48px 20px",textAlign:"center",color:"#94A3B8",fontSize:13}}>
-              No entries match your filter or search
-            </div>
-          )}
-        </div>
-
-        {/* PLAN STRUCTURE */}
-        <div style={{marginTop:12,background:"#fff",borderRadius:14,border:"1px solid #E2E8F0",padding:16,boxShadow:"0 1px 3px rgba(0,0,0,.04)"}}>
-          <div style={{fontWeight:800,color:"#1E293B",fontSize:13,marginBottom:10}}>📌 How This Plan Works</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:12}}>
-            {Object.entries(SC).map(([k,v])=>(
-              <div key={k} style={{display:"flex",alignItems:"center",gap:7,padding:"6px 8px",borderRadius:8,background:v.bg,border:`1px solid ${v.border}`,fontSize:11}}>
-                <span>{v.emoji}</span>
-                <span style={{fontWeight:700,color:v.txt}}>{v.label||k}</span>
-              </div>
-            ))}
-          </div>
-          <div style={{fontSize:11.5,color:"#475569",lineHeight:2}}>
-            <p style={{margin:"2px 0"}}>⏱️ <b>Daily:</b> 30 min concept study → 60 min practice questions</p>
-            <p style={{margin:"2px 0"}}>📅 <b>Weekly rotation:</b> Mon=Math · Tue=Physics · Wed=Chemistry · Thu=Biology · Fri=Math/Revision</p>
-            <p style={{margin:"2px 0"}}>🔁 <b>Every 3rd Friday:</b> Full weekly revision across all 4 subjects</p>
-            <p style={{margin:"2px 0"}}>📝 <b>Every 7th Friday:</b> Monthly full-syllabus mock test (3 hours)</p>
-            <p style={{margin:"2px 0"}}>🛡️ <b>Every 15th study day:</b> Buffer/catch-up day (no new content)</p>
-            <p style={{margin:"2px 0"}}>🎉 <b>Public holidays excluded:</b> Good Friday, Labour Day, Independence Day, Gandhi Jayanti, Diwali (2 days), Guru Nanak Jayanti</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+// Build month map
+const monthMap=new Map();
+for(const d of PLAN){
+  const mk=fmtMonth(d.date);
+  if(!monthMap.has(mk))monthMap.set(mk,[]);
+  monthMap.get(mk).push(d);
 }
+const monthKeys=[...monthMap.keys()];
+
+// Stats
+const stats={};
+for(const d of PLAN) stats[d.subject]=(stats[d.subject]||0)+1;
+document.getElementById("s-Math").textContent=stats.Math||0;
+document.getElementById("s-Physics").textContent=stats.Physics||0;
+document.getElementById("s-Chemistry").textContent=stats.Chemistry||0;
+document.getElementById("s-Biology").textContent=stats.Biology||0;
+document.getElementById("s-Revision").textContent=stats.Revision||0;
+document.getElementById("s-Buffer").textContent=stats.Buffer||0;
+document.getElementById("s-Mock").textContent=stats.Mock||0;
+document.getElementById("s-Holiday").textContent=stats.Holiday||0;
+document.getElementById("s-Total").textContent=(stats.Math||0)+(stats.Physics||0)+(stats.Chemistry||0)+(stats.Biology||0);
+
+// Legend
+const legEl=document.getElementById("legend");
+for(const[k,v] of Object.entries(SC)){
+  const d=document.createElement("div");
+  d.className="leg-item";
+  d.style.background=v.bg; d.style.borderColor=v.border;
+  d.innerHTML=`<span>${v.emoji}</span><span class="leg-lbl" style="color:${v.txt}">${v.label||k}</span>`;
+  legEl.appendChild(d);
+}
+
+// Month tabs
+const tabsEl=document.getElementById("month-inner");
+let activeMonth=monthKeys[0];
+function renderTabs(){
+  tabsEl.innerHTML="";
+  for(const mk of monthKeys){
+    const b=document.createElement("button");
+    b.className="mtab"+(mk===activeMonth?" active":"");
+    b.textContent=mk.split(" ")[0];
+    b.onclick=()=>{activeMonth=mk;expandedDs=null;renderTabs();renderRows();};
+    tabsEl.appendChild(b);
+  }
+}
+
+// Filter & search state
+let activeFilter="All", searchVal="", expandedDs=null;
+
+// Filter buttons
+const filterKeys=["All","Math","Physics","Chemistry","Biology","Revision","Buffer","Mock","Holiday"];
+const fbEl=document.getElementById("filter-btns");
+function renderFilterBtns(){
+  fbEl.innerHTML="";
+  for(const s of filterKeys){
+    const cfg=SC[s]||{};
+    const active=activeFilter===s;
+    const b=document.createElement("button");
+    b.className="fbtn";
+    b.style.borderColor=active?(cfg.badge||"#1E3A5F"):"#E2E8F0";
+    b.style.background=active?(cfg.badge||"#1E3A5F"):"#F8FAFC";
+    b.style.color=active?"#fff":(cfg.txt||"#64748B");
+    b.innerHTML=(s!=="All"?`<span>${cfg.emoji} </span>`:"")+s;
+    b.onclick=()=>{activeFilter=s;expandedDs=null;renderFilterBtns();renderRows();};
+    fbEl.appendChild(b);
+  }
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+  searchVal=e.target.value;expandedDs=null;renderRows();
+});
+
+function renderRows(){
+  const days=monthMap.get(activeMonth)||[];
+  const rows=days.filter(d=>{
+    if(activeFilter!=="All"&&d.subject!==activeFilter)return false;
+    if(searchVal){const q=searchVal.toLowerCase();return(d.ch||"").toLowerCase().includes(q)||(d.concept||"").toLowerCase().includes(q);}
+    return true;
+  });
+  document.getElementById("mhdr-title").textContent=activeMonth;
+  document.getElementById("mhdr-count").textContent=rows.length+" "+(activeFilter!=="All"?activeFilter+" ":"")+"entries";
+  const container=document.getElementById("rows-container");
+  container.innerHTML="";
+  document.getElementById("empty").style.display=rows.length===0?"block":"none";
+  rows.forEach((d,i)=>{
+    const cfg=SC[d.subject]||{};
+    const isOpen=expandedDs===d.ds;
+    const rowDiv=document.createElement("div");
+    rowDiv.className="row";
+    rowDiv.style.background=isOpen?(cfg.bg||"#fff"):"#fff";
+    // Summary
+    const sum=document.createElement("div");
+    sum.className="row-summary";
+    sum.innerHTML=`
+      <div class="row-num">${i+1}</div>
+      <div class="row-date">${fmtDate(d.date)}</div>
+      <div class="row-dow">${fmtDay(d.date)}</div>
+      <div class="row-emoji">${cfg.emoji||""}</div>
+      <div class="row-ch">${d.ch}</div>
+      ${!isOpen?`<span class="row-badge" style="background:${cfg.badge}">${d.subject}</span>`:""}
+      <div class="row-arrow">${isOpen?"▲":"▼"}</div>`;
+    rowDiv.appendChild(sum);
+    // Detail
+    if(isOpen){
+      const det=document.createElement("div");
+      det.className="row-detail";
+      det.innerHTML=`
+        <div class="detail-box" style="background:rgba(255,255,255,.8);border-color:${cfg.border||"#E2E8F0"}">
+          <div class="detail-lbl" style="color:${cfg.txt||"#64748B"}">📖 Concept · 30 min</div>
+          <div class="detail-txt">${d.concept}</div>
+        </div>
+        <div class="detail-box" style="background:rgba(255,255,255,.8);border-color:${cfg.border||"#E2E8F0"}">
+          <div class="detail-lbl" style="color:${cfg.txt||"#64748B"}">✏️ Practice · 60 min</div>
+          <div class="detail-txt">${d.practice}</div>
+        </div>
+        <div><span class="detail-chip" style="background:${cfg.badge}">${cfg.emoji} ${cfg.label||d.subject}</span></div>`;
+      rowDiv.appendChild(det);
+    }
+    rowDiv.onclick=()=>{expandedDs=isOpen?null:d.ds;renderRows();};
+    container.appendChild(rowDiv);
+  });
+}
+
+renderTabs();
+renderFilterBtns();
+renderRows();
+</script>
+</body>
+</html>
